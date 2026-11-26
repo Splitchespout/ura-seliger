@@ -2029,7 +2029,9 @@ textarea {
   .site-footer {
     padding-bottom: 108px;
   }
-  /* Скрываем на узких телефонах всплывающее уведомление TravelLine, чтобы не перекрывать футер и FAQ */
+  /* Скрываем на узких телефонах всплывающий snackbar TravelLine, чтобы не перекрывать футер и FAQ */
+  .tl-widgets-container,
+  .tl-widget[data-kind="snackbar"],
   body > iframe {
     display: none !important;
   }
