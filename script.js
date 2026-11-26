@@ -123,6 +123,8 @@ if (mobileMenuBtn && mobileNav) {
 }
 
 /* ---------------- Мини-карусели на карточках номеров ---------------- */
+const cardSlideIndex = {};
+
 document.querySelectorAll('[data-carousel]').forEach((wrap) => {
   const roomId = wrap.dataset.carousel;
   const room = ROOMS[roomId];
@@ -131,6 +133,7 @@ document.querySelectorAll('[data-carousel]').forEach((wrap) => {
   const img = wrap.querySelector('.room-img');
   const dotsContainer = wrap.querySelector('.carousel-dots');
   let index = 0;
+  cardSlideIndex[roomId] = 0;
 
   room.photos.forEach((_, idx) => {
     const dot = document.createElement('span');
@@ -140,8 +143,14 @@ document.querySelectorAll('[data-carousel]').forEach((wrap) => {
 
   const dots = dotsContainer.querySelectorAll('.carousel-dot');
 
+  const updatePortraitClass = () => {
+    img.classList.toggle('is-portrait', img.naturalHeight > img.naturalWidth);
+  };
+  img.addEventListener('load', updatePortraitClass);
+
   const renderSlide = (nextIdx) => {
     index = (nextIdx + room.photos.length) % room.photos.length;
+    cardSlideIndex[roomId] = index;
     img.src = room.photos[index].src;
     img.alt = room.photos[index].alt;
     dots.forEach((d, i) => d.classList.toggle('active', i === index));
@@ -296,10 +305,30 @@ function updateCalculator() {
   let kids = Math.max(0, parseInt(calcKids.value, 10) || 0);
   const babies = Math.max(0, parseInt(calcBabies.value, 10) || 0);
 
-  // Ограничение вместимости для 2-местного номера
-  if (roomType === 'double' && adults > 2) {
-    adults = 2;
-    calcAdults.value = 2;
+  // Ограничение вместимости по типу номера
+  if (roomType === 'double') {
+    calcAdults.max = 2;
+    calcKids.max = 1;
+    if (adults > 2) {
+      adults = 2;
+      calcAdults.value = 2;
+    }
+    if (kids > 1) {
+      kids = 1;
+      calcKids.value = 1;
+    }
+  } else {
+    calcAdults.max = 4;
+    calcKids.max = Math.max(0, 4 - adults);
+    if (adults + kids > 4) {
+      kids = Math.max(0, 4 - adults);
+      calcKids.value = kids;
+    }
+  }
+
+  // Синхронизируем выпадающий список гостей в Hero
+  if (heroGuests && adults >= 1 && adults <= 4) {
+    heroGuests.value = String(adults);
   }
 
   aptMealsWrap.hidden = roomType !== 'apt';
@@ -492,7 +521,8 @@ document.querySelectorAll('.open-room-modal').forEach((btn) => {
       modalThumbs.appendChild(thumbBtn);
     });
 
-    renderModalPhoto(0);
+    const startIdx = btn.classList.contains('room-photos-btn') ? (cardSlideIndex[room.id] || 0) : 0;
+    renderModalPhoto(startIdx);
 
     const msg = `Здравствуйте! Интересует «${room.name}» в гостевом доме «Ура, Селигер!». Подскажите свободные даты и стоимость.`;
     modalWhatsappBtn.href = buildWhatsAppUrl(msg);
@@ -587,9 +617,21 @@ function initScrollReveal() {
     '.contacts-map-card',
   ];
 
-  const items = document.querySelectorAll(revealSelectors.join(', '));
+  const items = Array.from(document.querySelectorAll(revealSelectors.join(', ')));
+
+  const showElement = (el) => {
+    if (el.dataset.revealed === '1') return;
+    el.dataset.revealed = '1';
+    el.classList.add('is-visible');
+    // После завершения появления убираем inline delay и reveal-класс, чтобы не тормозить hover-анимацию карточек
+    window.setTimeout(() => {
+      el.style.transitionDelay = '';
+      el.classList.remove('reveal-item');
+    }, 750);
+  };
+
   if (!('IntersectionObserver' in window)) {
-    items.forEach((el) => el.classList.add('is-visible'));
+    items.forEach(showElement);
     return;
   }
 
@@ -597,20 +639,35 @@ function initScrollReveal() {
     (entries, obs) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
+          showElement(entry.target);
           obs.unobserve(entry.target);
         }
       });
     },
-    { threshold: 0.12, rootMargin: '0px 0px -36px 0px' }
+    { threshold: 0.01, rootMargin: '0px 0px 80px 0px' }
   );
 
   items.forEach((el, idx) => {
     el.classList.add('reveal-item');
-    // Мягкая каскадная задержка внутри одного ряда
     el.style.transitionDelay = `${(idx % 4) * 55}ms`;
     observer.observe(el);
   });
+
+  // Страховка на случай быстрого прыжка по якорю или быстрого свайпа на мобильном
+  const revealVisibleFallback = () => {
+    const vh = window.innerHeight || 800;
+    items.forEach((el) => {
+      if (el.dataset.revealed === '1') return;
+      const rect = el.getBoundingClientRect();
+      if (rect.top < vh + 100) {
+        showElement(el);
+        observer.unobserve(el);
+      }
+    });
+  };
+
+  window.addEventListener('scroll', revealVisibleFallback, { passive: true });
+  window.setTimeout(revealVisibleFallback, 300);
 }
 
 initScrollReveal();

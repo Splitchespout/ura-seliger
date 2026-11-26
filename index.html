@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body>
   <!-- Шапка сайта (в стиле Референса 1: чистая скандинавская навигация + бейдж Яндекс Карт 5.0) -->
@@ -58,6 +58,7 @@
       <a href="#calculator">Расчёт цены</a>
       <a href="#gallery">Фотографии</a>
       <a href="#reviews">Отзывы гостей (5.0 ★)</a>
+      <a href="#faq">Частые вопросы</a>
       <a href="#contacts">Как добраться и контакты</a>
       <a href="tel:+79259223340" class="mobile-phone">+7 (925) 922-33-40</a>
     </nav>
@@ -80,7 +81,7 @@
 
           <div class="hero-content">
             <div class="hero-badges">
-              <span class="glass-badge">🏆 Награда «Хорошее место» · 235+ оценок</span>
+              <span class="glass-badge">🏆 «Хорошее место» · 235+ оценок</span>
               <span class="glass-badge">📍 д. Конец, оз. Серменок (Селигер)</span>
             </div>
             <h1>Ура, Селигер!</h1>
@@ -260,8 +261,8 @@
               </ul>
               <div class="room-footer">
                 <div class="room-price">
-                  <strong>5 000 ₽</strong>
-                  <span>/ ночь за двоих (+2 000 ₽ доп.)</span>
+                  <strong>5&nbsp;000&nbsp;₽</strong>
+                  <span>за двоих · доп. +2&nbsp;000&nbsp;₽</span>
                 </div>
                 <button type="button" class="btn btn-primary open-room-modal" data-room="family">
                   Обзор номера
@@ -311,8 +312,8 @@
               </ul>
               <div class="room-footer">
                 <div class="room-price">
-                  <strong>от 3 000 ₽</strong>
-                  <span>/ ночь (5 000 ₽ за двоих)</span>
+                  <strong>от 3&nbsp;000&nbsp;₽</strong>
+                  <span>/ ночь (5&nbsp;000&nbsp;₽ за двоих)</span>
                 </div>
                 <button type="button" class="btn btn-outline open-room-modal" data-room="double">
                   Обзор номера
@@ -861,13 +862,12 @@
           <div class="contacts-map-card">
             <div class="map-frame-wrap">
               <iframe
-                src="https://yandex.ru/map-widget/v1/?oid=99326439256&ol=biz&z=13"
+                src="https://yandex.ru/map-widget/v1/?ll=32.9861%2C57.1717&z=13&pt=32.9861,57.1717,pm2gnm"
                 width="100%"
-                height="100%"
+                height="340"
                 frameborder="0"
                 allowfullscreen="true"
-                loading="lazy"
-                title="Интерактивная Яндекс Карта — Гостевой дом Ура, Селигер!"
+                title="Интерактивная Яндекс Карта — Гостевой дом Ура, Селигер! (д. Конец, оз. Серменок)"
               ></iframe>
             </div>
             <div class="route-card route-card-bottom">
@@ -904,6 +904,7 @@
         <a href="#rooms">Номера</a>
         <a href="#leisure">Отдых</a>
         <a href="#calculator">Цены</a>
+        <a href="#faq">Вопросы</a>
         <a href="https://vk.com/seligerura" target="_blank" rel="noopener noreferrer">ВКонтакте</a>
         <a href="tel:+79259223340">+7 (925) 922-33-40</a>
       </div>
@@ -916,7 +917,7 @@
       <button type="button" class="modal-close" data-close-dialog aria-label="Закрыть окно">✕</button>
       <div class="modal-gallery">
         <div class="modal-main-stage">
-          <img src="" alt="" id="modalMainImg" />
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E" alt="Фотография номера" id="modalMainImg" />
           <button type="button" class="modal-nav prev" id="modalPrevBtn" aria-label="Предыдущее фото номера">‹</button>
           <button type="button" class="modal-nav next" id="modalNextBtn" aria-label="Следующее фото номера">›</button>
           <div class="modal-photo-caption" id="modalPhotoCaption"></div>
@@ -947,7 +948,7 @@
       <button type="button" class="modal-close" data-close-dialog aria-label="Закрыть окно">✕</button>
       <span class="eyebrow">Прямая заявка</span>
       <h3 id="requestModalTitle">Оставить заявку на бронь</h3>
-      <p class="modal-sub">Перезвоним или напишем в WhatsApp в течение 15 минут, чтобы подтвердить свободные даты.</p>
+      <p class="modal-sub">Укажите имя и телефон — мы сразу подготовим заполненную заявку для отправки администратору в WhatsApp или для быстрого звонка.</p>
 
       <form id="callbackForm" class="callback-form">
         <div class="form-group">
@@ -962,16 +963,21 @@
           <label for="guestComment">Пожелания (необязательно)</label>
           <textarea id="guestComment" name="comment" rows="3" placeholder="Даты, баня, поездка с питомцем..."></textarea>
         </div>
-        <button type="submit" class="btn btn-primary btn-full">Отправить заявку</button>
+        <button type="submit" class="btn btn-primary btn-full">Сформировать заявку</button>
       </form>
 
       <div class="form-success" id="callbackSuccess" hidden>
         <div class="success-icon">✓</div>
-        <h4>Заявка сформирована!</h4>
+        <h4>Заявка готова к отправке!</h4>
         <p id="callbackSummaryText"></p>
-        <a href="#" id="callbackWhatsappLink" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full">
-          Открыть заявку в WhatsApp
-        </a>
+        <div class="modal-cta-row">
+          <a href="#" id="callbackWhatsappLink" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full">
+            Отправить в WhatsApp
+          </a>
+          <a href="tel:+79259223340" class="btn btn-outline btn-full">
+            Позвонить +7 (925) 922-33-40
+          </a>
+        </div>
       </div>
     </div>
   </dialog>
@@ -982,7 +988,7 @@
       <button type="button" class="lightbox-close" data-close-dialog aria-label="Закрыть фото">✕</button>
       <button type="button" class="lightbox-nav prev" id="lbPrev" aria-label="Предыдущее фото">‹</button>
       <figure class="lightbox-figure">
-        <img src="" alt="" id="lbImg" />
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E" alt="Просмотр фотографии" id="lbImg" />
         <figcaption id="lbCaption"></figcaption>
       </figure>
       <button type="button" class="lightbox-nav next" id="lbNext" aria-label="Следующее фото">›</button>
@@ -1002,6 +1008,6 @@
     </span>
   </a>
 
-  <script src="script.js?v=4"></script>
+  <script src="script.js?v=5"></script>
 </body>
 </html>

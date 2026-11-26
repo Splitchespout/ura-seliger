@@ -35,13 +35,22 @@ html {
   font-size: 16px;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 body {
   margin: 0;
   font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background-color: var(--bg-page);
   color: var(--ink);
   line-height: 1.6;
+  overflow-x: clip;
   -webkit-font-smoothing: antialiased;
+}
+
+section[id] {
+  scroll-margin-top: 88px;
 }
 
 img {
@@ -221,7 +230,10 @@ textarea {
   border: 1px solid transparent;
   cursor: pointer;
   transition: background-color var(--transition), transform var(--transition), border-color var(--transition), box-shadow var(--transition);
-  white-space: nowrap;
+  text-align: center;
+  max-width: 100%;
+  white-space: normal;
+  line-height: 1.3;
 }
 
 .btn:active {
@@ -556,6 +568,11 @@ textarea {
   transition: transform 0.45s ease;
 }
 
+.room-img.is-portrait {
+  object-fit: contain;
+  background: #1c221e;
+}
+
 .room-card:hover .room-img {
   transform: scale(1.03);
 }
@@ -639,15 +656,15 @@ textarea {
 
 .carousel-dots {
   position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 16px;
+  left: 12px;
   display: flex;
   gap: 6px;
   padding: 5px 9px;
   border-radius: 999px;
-  background: rgba(20, 24, 21, 0.35);
+  background: rgba(20, 24, 21, 0.48);
   backdrop-filter: blur(6px);
+  z-index: 2;
 }
 
 .carousel-dot {
@@ -736,6 +753,13 @@ textarea {
   gap: 12px;
 }
 
+.room-price {
+  min-height: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .room-price strong {
   display: block;
   font-size: 1.24rem;
@@ -747,6 +771,7 @@ textarea {
 .room-price span {
   font-size: 0.78rem;
   color: var(--ink-muted);
+  line-height: 1.3;
 }
 
 .children-note {
@@ -789,12 +814,13 @@ textarea {
   border-radius: var(--radius-md);
   overflow: hidden;
   display: grid;
-  grid-template-columns: 0.95fr 1.05fr;
+  grid-template-columns: 245px 1fr;
   box-shadow: var(--shadow-sm);
 }
 
 .leisure-img-wrap {
-  min-height: 240px;
+  min-height: 260px;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -1321,7 +1347,7 @@ textarea {
 
 .map-frame-wrap {
   flex: 1;
-  min-height: 310px;
+  min-height: 340px;
   background: #e5e0d4;
 }
 
@@ -1329,14 +1355,18 @@ textarea {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 310px;
+  min-height: 340px;
   border: 0;
+}
+
+.route-card {
+  padding: 20px 22px;
+  background: var(--surface);
 }
 
 .route-card-bottom {
   position: static;
   border-radius: 0;
-  background: var(--surface);
   border-top: 1px solid var(--border);
   box-shadow: none;
   display: flex;
@@ -1346,8 +1376,26 @@ textarea {
   flex-wrap: wrap;
 }
 
-.route-card-bottom p {
-  margin-bottom: 0;
+.route-card strong {
+  display: block;
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.route-card p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--ink-muted);
+}
+
+.route-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--pine);
+  background: var(--pine-soft);
+  padding: 4px 10px;
+  border-radius: 999px;
 }
 
 .route-card-actions {
@@ -1529,52 +1577,11 @@ textarea {
   }
 }
 
-.contacts-visual img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.route-card {
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  bottom: 20px;
-  padding: 20px 22px;
-  border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: var(--shadow-md);
-}
-
-.route-card strong {
-  display: block;
-  font-size: 1rem;
-  margin-bottom: 6px;
-}
-
-.route-card p {
-  margin: 0 0 10px;
-  font-size: 0.88rem;
-  color: var(--ink-muted);
-}
-
-.route-badge {
-  display: inline-block;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--pine);
-  background: var(--pine-soft);
-  padding: 4px 10px;
-  border-radius: 999px;
-}
-
 /* --------------------------------------------------------------------------
    Подвал
    -------------------------------------------------------------------------- */
 .site-footer {
-  padding: 36px 0;
+  padding: 36px 0 92px;
   border-top: 1px solid var(--border);
   background: var(--bg-page);
 }
@@ -1677,12 +1684,15 @@ textarea {
   background: #1c211e;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .modal-main-stage {
   position: relative;
   flex: 1;
-  min-height: 350px;
+  min-height: 360px;
+  min-width: 0;
   background: #141816;
   display: flex;
   align-items: center;
@@ -1693,7 +1703,8 @@ textarea {
 .modal-main-stage > img {
   width: 100%;
   height: 360px;
-  object-fit: cover;
+  object-fit: contain;
+  background: #141816;
 }
 
 .modal-nav {
@@ -1775,6 +1786,7 @@ textarea {
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .modal-info h3,
@@ -1994,9 +2006,13 @@ textarea {
   .floating-call-btn {
     right: 14px;
     bottom: 14px;
-    padding: 8px 14px 8px 8px;
+    padding: 6px;
+    width: 54px;
+    height: 54px;
+    justify-content: center;
+    gap: 0;
   }
-  .call-btn-text small {
+  .call-btn-text {
     display: none;
   }
   .leisure-card {
@@ -2014,10 +2030,17 @@ textarea {
   }
   .modal-box {
     grid-template-columns: 1fr;
+    overflow-x: hidden;
     overflow-y: auto;
   }
-  .modal-gallery > img {
-    height: 230px;
+  .modal-main-stage {
+    min-height: 230px;
+  }
+  .modal-main-stage > img {
+    height: 240px;
+  }
+  .modal-info {
+    padding: 20px;
   }
   .carousel-btn {
     opacity: 0.92;
