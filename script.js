@@ -221,7 +221,37 @@ const tlState = {
   nights: 2,
   adults: 2,
   roomType: '',
+  pendingSync: false,
 };
+
+function findTravelLineIframe() {
+  return document.querySelector('#tl-booking-form iframe[src*="tlintegration"]');
+}
+
+function updateTravelLineIframeSrc(iframe) {
+  if (!iframe) return false;
+  const rawSrc = iframe.getAttribute('src') || iframe.src || '';
+  if (!rawSrc.includes('tlintegration')) return false;
+  try {
+    const iframeUrl = new URL(rawSrc);
+    if (tlState.date) iframeUrl.searchParams.set('date', tlState.date);
+    iframeUrl.searchParams.set('nights', String(tlState.nights || 2));
+    iframeUrl.searchParams.set('adults', String(tlState.adults || 2));
+    iframeUrl.searchParams.delete('room-type');
+    if (tlState.roomType) {
+      iframeUrl.searchParams.set('roomTypes', tlState.roomType);
+    } else {
+      iframeUrl.searchParams.delete('roomTypes');
+    }
+    iframeUrl.searchParams.set('_tlr', String(Date.now()));
+    iframeUrl.hash = '#/rooms';
+    iframe.setAttribute('src', iframeUrl.toString());
+    tlState.pendingSync = false;
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
 
 function initBookingDates() {
   const now = new Date();
@@ -315,31 +345,42 @@ function updateActiveFilterButton() {
 }
 
 function hideTlLoaderIfIframeReady() {
-  if (!tlBookingContainer || !tlLoadingState) return;
-  const iframe = tlBookingContainer.querySelector('iframe');
+  if (!tlLoadingState) return;
+  const iframe = findTravelLineIframe();
   if (iframe) {
     tlLoadingState.hidden = true;
+    if (tlState.pendingSync) {
+      updateTravelLineIframeSrc(iframe);
+    }
   }
 }
 
 function loadTravelLineBookingWidget() {
   if (!tlBookingContainer) return;
 
-  // Отслеживаем появление официального iframe от TravelLine, чтобы убрать индикатор загрузки
+  // Отслеживаем появление рабочего iframe от TravelLine (в контейнере бывают служебные пустые iframe с src=null)
   if ('MutationObserver' in window) {
     const obs = new MutationObserver(() => {
-      const iframe = tlBookingContainer.querySelector('iframe');
+      const iframe = findTravelLineIframe();
       if (iframe) {
-        tlLoadingState.hidden = true;
+        if (tlLoadingState) tlLoadingState.hidden = true;
+        if (tlState.pendingSync) {
+          updateTravelLineIframeSrc(iframe);
+        }
         obs.disconnect();
       }
     });
-    obs.observe(tlBookingContainer, { childList: true, subtree: true });
+    obs.observe(tlBookingContainer, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['src'],
+    });
   }
 
   // Страховка: если на медленном соединении скрипт долго грузится, через 12 сек показываем подсказку со ссылкой
   window.setTimeout(() => {
-    if (tlLoadingState && !tlLoadingState.hidden && !tlBookingContainer.querySelector('iframe')) {
+    if (tlLoadingState && !tlLoadingState.hidden && !findTravelLineIframe()) {
       const p = tlLoadingState.querySelector('p');
       if (p) {
         p.innerHTML =
@@ -359,7 +400,6 @@ function loadTravelLineBookingWidget() {
       'booking-form',
       {
         gpPagePath: TL_CONFIG.guestAccountUrl,
-        bfPagePath: window.location.pathname,
         provider: TL_CONFIG.providerId,
         theme: TL_CONFIG.theme,
         container: 'tl-booking-form',
@@ -408,21 +448,11 @@ function applyBookingParamsToTravelLine({ scrollToBooking = false } = {}) {
   updateFallbackLink();
   updateActiveFilterButton();
 
-  const iframe = tlBookingContainer ? tlBookingContainer.querySelector('iframe') : null;
-  if (iframe && iframe.src && iframe.src.includes('tlintegration')) {
-    try {
-      const iframeUrl = new URL(iframe.src);
-      if (tlState.date) iframeUrl.searchParams.set('date', tlState.date);
-      iframeUrl.searchParams.set('nights', String(tlState.nights || 2));
-      iframeUrl.searchParams.set('adults', String(tlState.adults || 2));
-      if (tlState.roomType) {
-        iframeUrl.searchParams.set('room-type', tlState.roomType);
-      } else {
-        iframeUrl.searchParams.delete('room-type');
-      }
-      iframeUrl.hash = '#/rooms';
-      iframe.src = iframeUrl.toString();
-    } catch (_) {}
+  const iframe = findTravelLineIframe();
+  if (iframe) {
+    updateTravelLineIframeSrc(iframe);
+  } else {
+    tlState.pendingSync = true;
   }
 
   if (scrollToBooking && bookingSection) {
@@ -634,7 +664,6 @@ function initScrollReveal() {
     '.room-card',
     '.children-note',
     '.leisure-card',
-    '.tl-booking-shell',
     '.gallery-item',
     '.review-card',
     '.faq-item',
@@ -668,22 +697,23 @@ function initScrollReveal() {
         }
       });
     },
-    { threshold: 0.01, rootMargin: '0px 0px 100px 0px' }
+    { threshold: 0.01, rootMargin: '0px 0px 140px 0px' }
   );
 
   items.forEach((el, idx) => {
     el.classList.add('reveal-item');
-    el.style.transitionDelay = `${(idx % 4) * 50}ms`;
+    el.style.transitionDelay = `${(idx % 4) * 45}ms`;
     observer.observe(el);
   });
 
-  // Страховка на случай быстрого прыжка по якорю или быстрого свайпа на мобильном
+  // Страховка на случай быстрого прыжка по якорю, клавиши End или смещения высоты после загрузки iframe TravelLine
   const revealVisibleFallback = () => {
     const vh = window.innerHeight || 800;
+    const atBottom = window.scrollY + vh >= document.documentElement.scrollHeight - 140;
     items.forEach((el) => {
       if (el.dataset.revealed === '1') return;
       const rect = el.getBoundingClientRect();
-      if (rect.top < vh + 120) {
+      if (atBottom || rect.top < vh + 180) {
         showElement(el);
         observer.unobserve(el);
       }
@@ -691,8 +721,15 @@ function initScrollReveal() {
   };
 
   window.addEventListener('scroll', revealVisibleFallback, { passive: true });
+  window.addEventListener('scrollend', revealVisibleFallback, { passive: true });
+  window.addEventListener('resize', revealVisibleFallback, { passive: true });
   window.addEventListener('hashchange', () => window.setTimeout(revealVisibleFallback, 120));
+  if ('ResizeObserver' in window && document.body) {
+    const ro = new ResizeObserver(revealVisibleFallback);
+    ro.observe(document.body);
+  }
   window.setTimeout(revealVisibleFallback, 250);
+  window.setTimeout(revealVisibleFallback, 900);
 }
 
 initScrollReveal();
