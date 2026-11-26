@@ -121,13 +121,14 @@ textarea {
 .main-nav {
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 22px;
 }
 
 .main-nav a {
-  font-size: 0.94rem;
+  font-size: 0.93rem;
   font-weight: 500;
   color: var(--ink-muted);
+  white-space: nowrap;
   transition: color var(--transition);
 }
 
@@ -138,7 +139,27 @@ textarea {
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+}
+
+.guest-account-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: var(--pine-soft);
+  border: 1px solid rgba(74, 107, 83, 0.22);
+  color: var(--pine);
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background-color var(--transition), color var(--transition), transform var(--transition);
+}
+
+.guest-account-pill:hover {
+  background: var(--pine);
+  color: #ffffff;
+  transform: translateY(-1px);
 }
 
 .rating-pill {
@@ -189,7 +210,19 @@ textarea {
   width: 100%;
   background: var(--ink);
   border-radius: 2px;
-  transition: transform var(--transition);
+  transition: transform var(--transition), opacity var(--transition);
+}
+
+.mobile-menu-btn.is-open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.mobile-menu-btn.is-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.mobile-menu-btn.is-open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
 }
 
 .mobile-nav {
@@ -201,6 +234,12 @@ textarea {
   background: var(--surface);
 }
 
+@media (min-width: 1025px) {
+  .mobile-nav {
+    display: none !important;
+  }
+}
+
 .mobile-nav[hidden] {
   display: none;
 }
@@ -208,6 +247,12 @@ textarea {
 .mobile-nav a {
   font-weight: 600;
   padding: 6px 0;
+}
+
+.mobile-guest-link {
+  color: var(--pine);
+  border-top: 1px solid var(--border);
+  padding-top: 14px !important;
 }
 
 .mobile-phone {
@@ -265,6 +310,11 @@ textarea {
 
 .btn-full {
   width: 100%;
+}
+
+.btn-sm {
+  padding: 10px 16px;
+  font-size: 0.88rem;
 }
 
 /* --------------------------------------------------------------------------
@@ -748,13 +798,19 @@ textarea {
   padding-top: 16px;
   border-top: 1px solid var(--border);
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
   gap: 12px;
 }
 
+.room-card-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
 .room-price {
-  min-height: 44px;
+  min-height: 42px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -866,12 +922,9 @@ textarea {
 }
 
 /* --------------------------------------------------------------------------
-   Интерактивный калькулятор
+   Официальный модуль онлайн-бронирования TravelLine (#booking)
    -------------------------------------------------------------------------- */
-.calc-shell {
-  display: grid;
-  grid-template-columns: 1.2fr 0.8fr;
-  gap: 28px;
+.tl-booking-shell {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -879,218 +932,167 @@ textarea {
   box-shadow: var(--shadow-md);
 }
 
-.calc-intro {
-  margin: 10px 0 26px;
+.tl-booking-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.tl-booking-intro {
+  margin: 10px 0 0;
   color: var(--ink-muted);
-  max-width: 560px;
+  max-width: 640px;
+  font-size: 0.96rem;
 }
 
-.calc-form {
+.tl-head-meta {
   display: flex;
-  flex-direction: column;
-  gap: 18px;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.calc-row {
-  display: grid;
-  gap: 16px;
-}
-
-.calc-row.two-col {
-  grid-template-columns: 1.45fr 0.75fr;
-}
-
-.calc-row.two-col-equal {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.calc-row.three-col {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.form-group label {
+.tl-trust-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--pine-soft);
+  color: var(--pine);
   font-size: 0.84rem;
   font-weight: 700;
-  color: var(--ink);
 }
 
-.form-group select,
-.form-group input[type="date"],
-.form-group input[type="text"],
-.form-group input[type="tel"],
-.form-group textarea {
-  width: 100%;
-  padding: 13px 15px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-page);
-  font-size: 0.95rem;
-  font-weight: 600;
-  outline: none;
-  transition: border-color var(--transition), background var(--transition);
-}
-
-.form-group input[type="date"] {
-  cursor: pointer;
-}
-
-.form-group select:focus,
-.form-group input:focus,
-.form-group textarea:focus {
-  border-color: var(--pine);
-  background: var(--surface);
-}
-
-.stepper {
-  display: grid;
-  grid-template-columns: 42px 1fr 42px;
-  align-items: center;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  background: var(--bg-page);
-  overflow: hidden;
-  height: 48px;
-}
-
-.step-btn {
-  border: none;
-  background: transparent;
-  font-size: 1.25rem;
-  font-weight: 600;
-  cursor: pointer;
-  height: 100%;
-  color: var(--pine);
-  transition: background var(--transition);
-}
-
-.step-btn:hover {
-  background: var(--pine-soft);
-}
-
-.stepper input {
-  border: none;
-  background: transparent;
-  text-align: center;
-  font-weight: 700;
-  font-size: 1rem;
-  width: 100%;
-  outline: none;
-  -moz-appearance: textfield;
-}
-
-.checkbox-card {
+.tl-room-filter {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg-page);
-  cursor: pointer;
-}
-
-.checkbox-card input {
-  width: 19px;
-  height: 19px;
-  accent-color: var(--pine);
-  margin-top: 2px;
-}
-
-.checkbox-card strong {
-  display: block;
-  font-size: 0.92rem;
-}
-
-.checkbox-card small {
-  display: block;
-  font-size: 0.82rem;
-  color: var(--ink-muted);
-}
-
-.calc-summary {
-  background: var(--bg-page);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 26px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-.summary-badge {
-  display: inline-block;
-  font-size: 0.76rem;
-  font-weight: 700;
-  color: var(--pine);
-  background: var(--pine-soft);
-  padding: 5px 11px;
-  border-radius: 999px;
-  margin-bottom: 8px;
-}
-
-.summary-dates {
-  font-weight: 700;
-  font-size: 1.02rem;
-}
-
-.summary-breakdown {
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: 10px;
-  padding: 14px 0;
-  border-top: 1px dashed var(--border);
-  border-bottom: 1px dashed var(--border);
-  font-size: 0.91rem;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--border);
 }
 
-.breakdown-line {
+.tl-filter-btn {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-page);
+  color: var(--ink-muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.tl-filter-btn:hover {
+  border-color: var(--pine);
+  color: var(--pine);
+}
+
+.tl-filter-btn.is-active {
+  background: var(--pine);
+  border-color: var(--pine);
+  color: #ffffff;
+}
+
+.tl-widget-stage {
+  position: relative;
+  min-height: 420px;
+  border-radius: var(--radius-md);
+  background: var(--bg-page);
+  border: 1px solid var(--border);
+  padding: 16px;
+  overflow: hidden;
+}
+
+.tl-loading-state {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 360px;
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 0.94rem;
+  font-weight: 500;
+}
+
+.tl-loading-state p {
+  margin: 0;
+}
+
+.tl-spinner {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid var(--border);
+  border-top-color: var(--pine);
+  animation: tlSpin 0.8s linear infinite;
+}
+
+@keyframes tlSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tl-booking-container {
+  width: 100%;
+  min-height: 60px;
+}
+
+.tl-booking-container iframe {
+  width: 100% !important;
+  border: none !important;
+}
+
+.tl-booking-foot {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
   color: var(--ink-muted);
 }
 
-.breakdown-line strong {
-  color: var(--ink);
+.tl-booking-foot p {
+  margin: 0;
+}
+
+.tl-booking-foot p a {
+  color: var(--pine);
+  font-weight: 700;
+}
+
+.tl-direct-link {
+  font-size: 0.88rem;
   white-space: nowrap;
 }
 
-.summary-total {
+.contact-inline-links {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-.summary-total span {
-  font-size: 0.95rem;
+.contact-email {
+  font-size: 0.96rem;
   font-weight: 600;
-}
-
-.summary-total strong {
-  font-size: 1.75rem;
-  font-weight: 800;
-  color: var(--pine);
-  letter-spacing: -0.02em;
-}
-
-.summary-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.summary-footnote {
-  margin: 0;
-  font-size: 0.78rem;
   color: var(--ink-muted);
-  text-align: center;
+  transition: color var(--transition);
+}
+
+.contact-email:hover {
+  color: var(--pine);
 }
 
 /* --------------------------------------------------------------------------
@@ -1939,7 +1941,8 @@ textarea {
    Адаптивность (Планшеты и мобильные телефоны)
    -------------------------------------------------------------------------- */
 @media (max-width: 1024px) {
-  .main-nav {
+  .main-nav,
+  .guest-account-pill {
     display: none;
   }
   .mobile-menu-btn {
@@ -1953,7 +1956,6 @@ textarea {
     grid-template-columns: repeat(2, 1fr);
   }
   .leisure-grid,
-  .calc-shell,
   .contacts-grid {
     grid-template-columns: 1fr;
   }
@@ -1997,10 +1999,7 @@ textarea {
   .highlights-grid,
   .rooms-grid,
   .reviews-grid,
-  .faq-grid,
-  .calc-row.two-col,
-  .calc-row.two-col-equal,
-  .calc-row.three-col {
+  .faq-grid {
     grid-template-columns: 1fr;
   }
   .floating-call-btn {
@@ -2021,9 +2020,20 @@ textarea {
   .leisure-img-wrap {
     min-height: 210px;
   }
-  .calc-shell,
+  .tl-booking-shell,
   .contacts-info {
-    padding: 22px;
+    padding: 20px;
+  }
+  .tl-widget-stage {
+    padding: 10px 8px;
+    min-height: 360px;
+  }
+  .tl-filter-btn {
+    padding: 8px 13px;
+    font-size: 0.83rem;
+  }
+  .tl-direct-link {
+    white-space: normal;
   }
   .gallery-item.span-2 {
     grid-column: span 1;

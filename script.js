@@ -1,19 +1,32 @@
 /* ==========================================================================
    Интерактивная логика сайта «Ура, Селигер!»
+   - Полная интеграция официального модуля бронирования TravelLine (providerId: 30650)
+   - Прямая привязка категорий номеров (203154, 203155, 203156) и Hero-поиска к TravelLine
    - Карусели реальных фото на карточках номеров
-   - Быстрый выбор дат в Hero
-   - Калькулятор стоимости по реальным тарифам гостевого дома
-   - Модальные окна (<dialog>) и лайтбокс фотогалереи
+   - Модальные окна (<dialog>), лайтбокс фотогалереи и Scroll Reveal
    ========================================================================== */
 
 const WHATSAPP_PHONE = '79259223340';
 
+const TL_CONFIG = {
+  providerId: '30650',
+  context: 'TL-EXPRESS',
+  theme: 'express-green',
+  currency: 'RUB',
+  language: 'ru',
+  hosts: ['ru-ibe.tlintegration.ru', 'ibe.tlintegration.ru', 'ibe.tlintegration.com'],
+  guestAccountUrl: 'https://uraseliger.ru/guest-account/',
+  directBookingUrl: 'https://uraseliger.ru/ru-ru/booking/',
+  smartWidgetToken: '3b36c6c5-5ded-433f-9be3-000022210100',
+};
+
 const ROOMS = {
   apt: {
     id: 'apt',
+    tlRoomType: '203156',
     name: 'Апартаменты-студия с кухней',
     tag: 'Собственная кухня · до 4 гостей',
-    priceLabel: '5 000 ₽ / ночь за апартаменты',
+    priceLabel: 'от 5 000 ₽ / ночь · точная цена в TravelLine',
     description:
       'Просторные светлые апартаменты с отдельным входом, деревянными балками, уютной спальной зоной, обеденным столом и собственной кухней. Идеальны для уединённого семейного отдыха.',
     amenities: [
@@ -34,9 +47,10 @@ const ROOMS = {
   },
   family: {
     id: 'family',
+    tlRoomType: '203155',
     name: '4-местный номер с диваном',
     tag: '3-разовое домашнее питание включено',
-    priceLabel: '5 000 ₽ / ночь за двоих (+2 000 ₽ доп. место)',
+    priceLabel: 'от 5 000 ₽ / ночь за двоих · точная цена в TravelLine',
     description:
       'Просторный тёплый номер (20 м²) с отделкой из натурального дерева в основном доме. Включает полный 3-разовый домашний пансион и доступ в уютную лаундж-зону с самоваром, чаем и настольными играми.',
     amenities: [
@@ -57,9 +71,10 @@ const ROOMS = {
   },
   double: {
     id: 'double',
+    tlRoomType: '203154',
     name: '2-местный номер в основном доме',
     tag: '3-разовое домашнее питание включено',
-    priceLabel: '3 000 ₽ за 1 гостя · 5 000 ₽ за двоих / ночь',
+    priceLabel: 'от 3 000 ₽ / ночь · точная цена в TravelLine',
     description:
       'Светлый уютный номер с большой двуспальной кроватью и видом из окна на озеро Серменок и зелёный сад. Отличный вариант для пары или спокойного отдыха у воды с домашним питанием.',
     amenities: [
@@ -80,28 +95,29 @@ const ROOMS = {
   },
 };
 
-/* ---------------- Форматирование чисел и дат ---------------- */
-function formatRub(amount) {
-  return new Intl.NumberFormat('ru-RU').format(Math.round(amount)) + ' ₽';
-}
-
-function formatDateRu(dateStr) {
-  if (!dateStr) return '';
-  const d = new Date(dateStr + 'T00:00:00');
-  if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
-}
-
-function pluralize(n, one, few, many) {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return `${n} ${one}`;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} ${few}`;
-  return `${n} ${many}`;
-}
-
 function buildWhatsAppUrl(text) {
   return `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(text)}`;
+}
+
+function toLocalIso(d) {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+function isValidIsoDate(val) {
+  return typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val);
+}
+
+function calcNightsBetween(startIso, endIso) {
+  if (!isValidIsoDate(startIso) || !isValidIsoDate(endIso)) return 2;
+  const start = new Date(startIso + 'T00:00:00');
+  const end = new Date(endIso + 'T00:00:00');
+  const diff = Math.round((end - start) / (1000 * 60 * 60 * 24));
+  return Math.max(1, Math.min(365, diff || 2));
+}
+
+function isMobileDevice() {
+  return window.innerWidth <= 768 || /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent || '');
 }
 
 /* ---------------- Мобильное меню и клик по логотипу «Ура, Селигер!» ---------------- */
@@ -109,28 +125,38 @@ const brandLink = document.querySelector('.brand');
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 const mobileNav = document.getElementById('mobileNav');
 
+function setMobileMenuOpen(open) {
+  if (!mobileNav || !mobileMenuBtn) return;
+  mobileNav.hidden = !open;
+  mobileMenuBtn.classList.toggle('is-open', open);
+  mobileMenuBtn.setAttribute('aria-expanded', String(open));
+  mobileMenuBtn.setAttribute('aria-label', open ? 'Закрыть меню' : 'Открыть меню');
+}
+
 if (brandLink) {
   brandLink.addEventListener('click', (e) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (mobileNav && !mobileNav.hidden) {
-      mobileNav.hidden = true;
-      if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
-    }
+    setMobileMenuOpen(false);
   });
 }
 
 if (mobileMenuBtn && mobileNav) {
   mobileMenuBtn.addEventListener('click', () => {
-    const isHidden = mobileNav.hidden;
-    mobileNav.hidden = !isHidden;
-    mobileMenuBtn.setAttribute('aria-expanded', String(isHidden));
+    setMobileMenuOpen(mobileNav.hidden);
   });
   mobileNav.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      mobileNav.hidden = true;
-      mobileMenuBtn.setAttribute('aria-expanded', 'false');
-    });
+    link.addEventListener('click', () => setMobileMenuOpen(false));
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !mobileNav.hidden) {
+      setMobileMenuOpen(false);
+    }
+  });
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 1024 && !mobileNav.hidden) {
+      setMobileMenuOpen(false);
+    }
   });
 }
 
@@ -179,50 +205,238 @@ document.querySelectorAll('[data-carousel]').forEach((wrap) => {
   });
 });
 
-/* ---------------- Даты по умолчанию в Hero и Калькуляторе (ближайшие пт–вс) ---------------- */
+/* ---------------- Интеграция официального модуля бронирования TravelLine ---------------- */
 const heroCheckin = document.getElementById('heroCheckin');
 const heroCheckout = document.getElementById('heroCheckout');
 const heroGuests = document.getElementById('heroGuests');
 const heroBookingForm = document.getElementById('heroBookingForm');
+const tlRoomFilter = document.getElementById('tlRoomFilter');
+const tlBookingContainer = document.getElementById('tl-booking-form');
+const tlLoadingState = document.getElementById('tlLoadingState');
+const tlFallbackLink = document.getElementById('tlFallbackLink');
+const bookingSection = document.getElementById('booking');
 
-const calcCheckin = document.getElementById('calcCheckin');
-const calcCheckout = document.getElementById('calcCheckout');
+const tlState = {
+  date: '',
+  nights: 2,
+  adults: 2,
+  roomType: '',
+};
 
-function toLocalIso(d) {
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-}
+function initBookingDates() {
+  const now = new Date();
+  const todayIso = toLocalIso(now);
+  const urlParams = new URLSearchParams(window.location.search);
 
-function setAllDates(checkinIso, checkoutIso) {
+  let checkinIso = urlParams.get('date');
+  let nights = parseInt(urlParams.get('nights') || '2', 10);
+  if (!Number.isFinite(nights) || nights < 1 || nights > 365) nights = 2;
+
+  if (!isValidIsoDate(checkinIso) || checkinIso < todayIso) {
+    const daysUntilFri = (5 - now.getDay() + 7) % 7 || 7;
+    const fri = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilFri);
+    checkinIso = toLocalIso(fri);
+  }
+
+  const endDate = new Date(checkinIso + 'T00:00:00');
+  endDate.setDate(endDate.getDate() + nights);
+  const checkoutIso = toLocalIso(endDate);
+
+  const adultsParam = parseInt(urlParams.get('adults') || '2', 10);
+  const adults = Number.isFinite(adultsParam) && adultsParam >= 1 && adultsParam <= 4 ? adultsParam : 2;
+  const roomTypeParam = urlParams.get('room-type') || '';
+
+  heroCheckin.min = todayIso;
   heroCheckin.value = checkinIso;
   heroCheckout.min = checkinIso;
   heroCheckout.value = checkoutIso;
-  if (calcCheckin && calcCheckout) {
-    calcCheckin.value = checkinIso;
-    calcCheckout.min = checkinIso;
-    calcCheckout.value = checkoutIso;
+  heroGuests.value = String(adults);
+
+  tlState.date = checkinIso;
+  tlState.nights = nights;
+  tlState.adults = adults;
+  tlState.roomType = ['203154', '203155', '203156'].includes(roomTypeParam) ? roomTypeParam : '';
+}
+
+function syncHeroDates(changedField) {
+  const checkinVal = heroCheckin.value;
+  if (!isValidIsoDate(checkinVal)) return;
+
+  let checkoutVal = heroCheckout.value;
+  if (!isValidIsoDate(checkoutVal) || checkoutVal <= checkinVal) {
+    const start = new Date(checkinVal + 'T00:00:00');
+    const keepNights = changedField === 'checkin' ? Math.max(1, tlState.nights || 2) : 1;
+    start.setDate(start.getDate() + keepNights);
+    checkoutVal = toLocalIso(start);
+  }
+
+  heroCheckout.min = checkinVal;
+  heroCheckout.value = checkoutVal;
+  tlState.date = checkinVal;
+  tlState.nights = calcNightsBetween(checkinVal, checkoutVal);
+  updateFallbackLink();
+}
+
+function buildTravelLineDirectUrl() {
+  const params = new URLSearchParams();
+  if (tlState.date) params.set('date', tlState.date);
+  params.set('nights', String(tlState.nights || 2));
+  params.set('adults', String(tlState.adults || 2));
+  if (tlState.roomType) params.set('room-type', tlState.roomType);
+  return `${TL_CONFIG.directBookingUrl}?${params.toString()}`;
+}
+
+function updateFallbackLink() {
+  if (tlFallbackLink) {
+    tlFallbackLink.href = buildTravelLineDirectUrl();
   }
 }
 
-function initDefaultDates() {
-  const now = new Date();
-  const daysUntilFri = (5 - now.getDay() + 7) % 7 || 7;
-  const fri = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilFri);
-  const sun = new Date(fri.getFullYear(), fri.getMonth(), fri.getDate() + 2);
-
-  const todayIso = toLocalIso(now);
-  const friIso = toLocalIso(fri);
-  const sunIso = toLocalIso(sun);
-
-  heroCheckin.min = todayIso;
-  if (calcCheckin) calcCheckin.min = todayIso;
-  setAllDates(friIso, sunIso);
+function syncUrlWithTlState() {
+  try {
+    const url = new URL(window.location.href);
+    if (tlState.date) url.searchParams.set('date', tlState.date);
+    url.searchParams.set('nights', String(tlState.nights || 2));
+    url.searchParams.set('adults', String(tlState.adults || 2));
+    if (tlState.roomType) {
+      url.searchParams.set('room-type', tlState.roomType);
+    } else {
+      url.searchParams.delete('room-type');
+    }
+    window.history.replaceState(null, '', url.pathname + '?' + url.searchParams.toString() + url.hash);
+  } catch (_) {}
 }
 
-initDefaultDates();
+function updateActiveFilterButton() {
+  if (!tlRoomFilter) return;
+  tlRoomFilter.querySelectorAll('.tl-filter-btn').forEach((btn) => {
+    btn.classList.toggle('is-active', (btn.dataset.tlFilter || '') === tlState.roomType);
+  });
+}
+
+function hideTlLoaderIfIframeReady() {
+  if (!tlBookingContainer || !tlLoadingState) return;
+  const iframe = tlBookingContainer.querySelector('iframe');
+  if (iframe) {
+    tlLoadingState.hidden = true;
+  }
+}
+
+function loadTravelLineBookingWidget() {
+  if (!tlBookingContainer) return;
+
+  // Отслеживаем появление официального iframe от TravelLine, чтобы убрать индикатор загрузки
+  if ('MutationObserver' in window) {
+    const obs = new MutationObserver(() => {
+      const iframe = tlBookingContainer.querySelector('iframe');
+      if (iframe) {
+        tlLoadingState.hidden = true;
+        obs.disconnect();
+      }
+    });
+    obs.observe(tlBookingContainer, { childList: true, subtree: true });
+  }
+
+  // Страховка: если на медленном соединении скрипт долго грузится, через 12 сек показываем подсказку со ссылкой
+  window.setTimeout(() => {
+    if (tlLoadingState && !tlLoadingState.hidden && !tlBookingContainer.querySelector('iframe')) {
+      const p = tlLoadingState.querySelector('p');
+      if (p) {
+        p.innerHTML =
+          'Модуль TravelLine загружается дольше обычного. Вы можете <a href="' +
+          buildTravelLineDirectUrl() +
+          '" target="_blank" rel="noopener noreferrer" style="color:var(--pine);font-weight:700;text-decoration:underline;">открыть бронирование напрямую ↗</a>.';
+      }
+    }
+  }, 12000);
+
+  const bookingSource = isMobileDevice() ? 'BS-MOBILE_SITE' : '';
+
+  const q = [
+    ['setContext', TL_CONFIG.context, TL_CONFIG.language],
+    [
+      'embed',
+      'booking-form',
+      {
+        gpPagePath: TL_CONFIG.guestAccountUrl,
+        bfPagePath: window.location.pathname,
+        provider: TL_CONFIG.providerId,
+        theme: TL_CONFIG.theme,
+        container: 'tl-booking-form',
+        adults: String(tlState.adults || 2),
+        language: TL_CONFIG.language,
+        currency: TL_CONFIG.currency,
+        autoScroll: 'none',
+        accommodationMode: 'auto',
+        source: bookingSource,
+        defaultCitizenship: 'RUS',
+      },
+    ],
+  ];
+
+  const t = (window.travelline = window.travelline || {});
+  const ti = (t.integration = t.integration || {});
+  ti.__cq = ti.__cq ? ti.__cq.concat(q) : q;
+
+  if (!ti.__loader) {
+    ti.__loader = true;
+    const head = document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0];
+    const loadNextHost = (hosts) => {
+      if (!hosts.length) return;
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.async = true;
+      script.src = 'https://' + hosts[0] + '/integration/loader.js';
+      script.onerror = script.onload = () => {
+        if (window.TL) {
+          hideTlLoaderIfIframeReady();
+          return;
+        }
+        if (script.parentNode === head) {
+          head.removeChild(script);
+        }
+        loadNextHost(hosts.slice(1));
+      };
+      head.appendChild(script);
+    };
+    loadNextHost(TL_CONFIG.hosts.slice());
+  }
+}
+
+function applyBookingParamsToTravelLine({ scrollToBooking = false } = {}) {
+  syncUrlWithTlState();
+  updateFallbackLink();
+  updateActiveFilterButton();
+
+  const iframe = tlBookingContainer ? tlBookingContainer.querySelector('iframe') : null;
+  if (iframe && iframe.src && iframe.src.includes('tlintegration')) {
+    try {
+      const iframeUrl = new URL(iframe.src);
+      if (tlState.date) iframeUrl.searchParams.set('date', tlState.date);
+      iframeUrl.searchParams.set('nights', String(tlState.nights || 2));
+      iframeUrl.searchParams.set('adults', String(tlState.adults || 2));
+      if (tlState.roomType) {
+        iframeUrl.searchParams.set('room-type', tlState.roomType);
+      } else {
+        iframeUrl.searchParams.delete('room-type');
+      }
+      iframeUrl.hash = '#/rooms';
+      iframe.src = iframeUrl.toString();
+    } catch (_) {}
+  }
+
+  if (scrollToBooking && bookingSection) {
+    bookingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+}
+
+initBookingDates();
+updateFallbackLink();
+updateActiveFilterButton();
+loadTravelLineBookingWidget();
 
 // Открываем нативный календарь при клике в любое место поля даты
-[heroCheckin, heroCheckout, calcCheckin, calcCheckout].forEach((el) => {
+[heroCheckin, heroCheckout].forEach((el) => {
   if (!el) return;
   el.addEventListener('click', () => {
     if (typeof el.showPicker === 'function') {
@@ -233,226 +447,49 @@ initDefaultDates();
   });
 });
 
-function isValidIsoDate(val) {
-  return typeof val === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(val);
-}
-
-function handleDateChange(checkinVal, checkoutVal, changedField) {
-  if (!isValidIsoDate(checkinVal)) return;
-
-  let outVal = checkoutVal;
-  if (!isValidIsoDate(outVal) || outVal <= checkinVal) {
-    // Если дата выезда раньше или равна дате заезда — сохраняем текущее число ночей (или минимум 1)
-    const start = new Date(checkinVal + 'T00:00:00');
-    const keepNights = changedField === 'checkin' ? Math.max(1, parseInt(calcNights.value, 10) || 2) : 1;
-    start.setDate(start.getDate() + keepNights);
-    outVal = toLocalIso(start);
-  }
-
-  setAllDates(checkinVal, outVal);
-  syncDatesToCalculator();
-}
-
 ['input', 'change'].forEach((evt) => {
-  heroCheckin.addEventListener(evt, () => handleDateChange(heroCheckin.value, heroCheckout.value, 'checkin'));
-  heroCheckout.addEventListener(evt, () => handleDateChange(heroCheckin.value, heroCheckout.value, 'checkout'));
-  if (calcCheckin && calcCheckout) {
-    calcCheckin.addEventListener(evt, () => handleDateChange(calcCheckin.value, calcCheckout.value, 'checkin'));
-    calcCheckout.addEventListener(evt, () => handleDateChange(calcCheckin.value, calcCheckout.value, 'checkout'));
-  }
+  heroCheckin.addEventListener(evt, () => syncHeroDates('checkin'));
+  heroCheckout.addEventListener(evt, () => syncHeroDates('checkout'));
 });
 
-heroGuests.addEventListener('change', syncHeroGuestsToCalculator);
+heroGuests.addEventListener('change', () => {
+  tlState.adults = Math.max(1, Math.min(4, parseInt(heroGuests.value, 10) || 2));
+  updateFallbackLink();
+});
 
 heroBookingForm.addEventListener('submit', (e) => {
   e.preventDefault();
-  syncDatesToCalculator();
-  syncHeroGuestsToCalculator();
-  document.getElementById('calculator').scrollIntoView({ behavior: 'smooth' });
+  syncHeroDates('checkin');
+  tlState.adults = Math.max(1, Math.min(4, parseInt(heroGuests.value, 10) || 2));
+  applyBookingParamsToTravelLine({ scrollToBooking: true });
 });
 
-/* ---------------- Калькулятор стоимости ---------------- */
-const calcRoom = document.getElementById('calcRoom');
-const calcNights = document.getElementById('calcNights');
-const calcAdults = document.getElementById('calcAdults');
-const calcKids = document.getElementById('calcKids');
-const calcBabies = document.getElementById('calcBabies');
-const aptMealsWrap = document.getElementById('aptMealsWrap');
-const calcAptMeals = document.getElementById('calcAptMeals');
-
-const summaryDates = document.getElementById('summaryDates');
-const summaryBreakdown = document.getElementById('summaryBreakdown');
-const summaryTotalPrice = document.getElementById('summaryTotalPrice');
-const whatsappBookBtn = document.getElementById('whatsappBookBtn');
-
-let lastCalculationText = '';
-
-function syncDatesToCalculator() {
-  if (!isValidIsoDate(heroCheckin.value) || !isValidIsoDate(heroCheckout.value)) {
-    updateCalculator();
-    return;
-  }
-  const start = new Date(heroCheckin.value + 'T00:00:00');
-  const end = new Date(heroCheckout.value + 'T00:00:00');
-  const diffDays = Math.round((end - start) / (1000 * 60 * 60 * 24));
-  if (diffDays >= 1) {
-    calcNights.value = Math.min(365, diffDays);
-  }
-  updateCalculator();
+// Кнопки фильтра категорий номеров над виджетом TravelLine
+if (tlRoomFilter) {
+  tlRoomFilter.querySelectorAll('.tl-filter-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      tlState.roomType = btn.dataset.tlFilter || '';
+      applyBookingParamsToTravelLine({ scrollToBooking: false });
+    });
+  });
 }
 
-function syncHeroGuestsToCalculator() {
-  const g = parseInt(heroGuests.value, 10) || 2;
-  calcAdults.value = g;
-  if (g > 2 && calcRoom.value === 'double') {
-    calcRoom.value = 'family';
-  }
-  updateCalculator();
-}
-
-function updateCalculator() {
-  const roomType = calcRoom.value;
-  const nights = Math.max(1, parseInt(calcNights.value, 10) || 2);
-  let adults = Math.max(1, parseInt(calcAdults.value, 10) || 2);
-  let kids = Math.max(0, parseInt(calcKids.value, 10) || 0);
-  const babies = Math.max(0, parseInt(calcBabies.value, 10) || 0);
-
-  // Ограничение вместимости по типу номера
-  if (roomType === 'double') {
-    calcAdults.max = 2;
-    calcKids.max = 1;
-    if (adults > 2) {
-      adults = 2;
-      calcAdults.value = 2;
-    }
-    if (kids > 1) {
-      kids = 1;
-      calcKids.value = 1;
-    }
-  } else {
-    calcAdults.max = 4;
-    calcKids.max = Math.max(0, 4 - adults);
-    if (adults + kids > 4) {
-      kids = Math.max(0, 4 - adults);
-      calcKids.value = kids;
-    }
-  }
-
-  // Синхронизируем выпадающий список гостей в Hero
-  if (heroGuests && adults >= 1 && adults <= 4) {
-    heroGuests.value = String(adults);
-  }
-
-  aptMealsWrap.hidden = roomType !== 'apt';
-
-  const lines = [];
-  let perNight = 0;
-
-  if (roomType === 'apt') {
-    perNight = 5000;
-    lines.push([`Апартаменты-студия × ${pluralize(nights, 'ночь', 'ночи', 'ночей')}`, formatRub(5000 * nights)]);
-    if (calcAptMeals.checked) {
-      const eaters = adults + kids;
-      const mealCost = eaters * 1350 * nights;
-      perNight += eaters * 1350;
-      lines.push([`3-разовое питание (${eaters} чел.)`, formatRub(mealCost)]);
-    }
-  } else if (roomType === 'double') {
-    const baseRate = adults === 1 ? 3000 : 5000;
-    perNight = baseRate;
-    lines.push([
-      `2-местный номер (${adults === 1 ? '1 гость' : '2 гостя'}, с питанием)`,
-      formatRub(baseRate * nights),
-    ]);
-    if (kids > 0) {
-      perNight += kids * 1000;
-      lines.push([`Дети 2–10 лет (${kids} чел., с питанием)`, formatRub(kids * 1000 * nights)]);
-    }
-  } else {
-    // 4-местный номер с диваном: база 5 000 ₽ за двоих, доп. взрослый +2 000 ₽, ребёнок 2–10 лет +1 000 ₽
-    const baseRate = adults === 1 ? 3000 : 5000;
-    const extraAdults = Math.max(0, adults - 2);
-    perNight = baseRate + extraAdults * 2000 + kids * 1000;
-    lines.push([
-      `4-местный номер (${adults === 1 ? '1 гость' : 'база за 2 гостей'}, с питанием)`,
-      formatRub(baseRate * nights),
-    ]);
-    if (extraAdults > 0) {
-      lines.push([`Доп. взрослые (${extraAdults} чел., с питанием)`, formatRub(extraAdults * 2000 * nights)]);
-    }
-    if (kids > 0) {
-      lines.push([`Дети 2–10 лет (${kids} чел., с питанием)`, formatRub(kids * 1000 * nights)]);
-    }
-  }
-
-  if (babies > 0) {
-    lines.push([`Малыши до 2 лет (${babies} чел.)`, 'Бесплатно']);
-  }
-
-  lines.push(['Пляж, лодки, мангал, Wi-Fi', 'Включено']);
-
-  const total = perNight * nights;
-
-  // Заголовок дат
-  const d1 = formatDateRu(heroCheckin.value);
-  const d2 = formatDateRu(heroCheckout.value);
-  summaryDates.textContent = d1 && d2
-    ? `${d1} — ${d2} · ${pluralize(nights, 'ночь', 'ночи', 'ночей')}`
-    : pluralize(nights, 'ночь', 'ночи', 'ночей');
-
-  summaryBreakdown.innerHTML = lines
-    .map(([label, val]) => `<div class="breakdown-line"><span>${label}</span><strong>${val}</strong></div>`)
-    .join('');
-
-  summaryTotalPrice.textContent = formatRub(total);
-
-  const guestsText = [
-    pluralize(adults, 'взрослый', 'взрослых', 'взрослых'),
-    kids > 0 ? pluralize(kids, 'ребёнок 2–10 лет', 'ребёнка 2–10 лет', 'детей 2–10 лет') : '',
-    babies > 0 ? pluralize(babies, 'малыш до 2 лет', 'малыша до 2 лет', 'малышей до 2 лет') : '',
-  ]
-    .filter(Boolean)
-    .join(', ');
-
-  const mealNote = roomType === 'apt' && calcAptMeals.checked ? ' + 3-разовое питание' : '';
-
-  lastCalculationText =
-    `Здравствуйте! Хотим забронировать «Ура, Селигер!»:\n` +
-    `• Размещение: ${ROOMS[roomType].name}${mealNote}\n` +
-    `• Даты: ${summaryDates.textContent}\n` +
-    `• Гости: ${guestsText}\n` +
-    `• Ориентировочный расчёт на сайте: ${formatRub(total)}\n` +
-    `Подскажите, пожалуйста, свободны ли эти даты?`;
-
-  whatsappBookBtn.href = buildWhatsAppUrl(lastCalculationText);
-}
-
-// Кнопки степперов (+/-)
-document.querySelectorAll('.step-btn').forEach((btn) => {
+// Кнопки «Забронировать» на карточках номеров (сразу выбирают категорию в TravelLine)
+document.querySelectorAll('.book-tl-room').forEach((btn) => {
   btn.addEventListener('click', () => {
-    const input = document.getElementById(btn.dataset.target);
-    const delta = parseInt(btn.dataset.delta, 10);
-    const min = parseInt(input.min, 10);
-    const max = parseInt(input.max, 10);
-    const next = Math.min(max, Math.max(min, (parseInt(input.value, 10) || 0) + delta));
-    input.value = next;
-    // Синхронизируем дату выезда в Hero и Калькуляторе при изменении количества ночей
-    if (btn.dataset.target === 'calcNights' && heroCheckin.value) {
-      const start = new Date(heroCheckin.value + 'T00:00:00');
-      start.setDate(start.getDate() + next);
-      setAllDates(heroCheckin.value, toLocalIso(start));
+    const roomType = btn.dataset.tlRoom || '';
+    tlState.roomType = roomType;
+    if (roomType === '203154' && tlState.adults > 2) {
+      tlState.adults = 2;
+      heroGuests.value = '2';
     }
-    updateCalculator();
+    applyBookingParamsToTravelLine({ scrollToBooking: true });
   });
 });
 
-calcRoom.addEventListener('change', updateCalculator);
-calcAptMeals.addEventListener('change', updateCalculator);
-
-updateCalculator();
-
 /* ---------------- Нативные модальные окна (<dialog>) + Light Dismiss ---------------- */
 function enableDialogLightDismiss(dialog) {
+  if (!dialog) return;
   dialog.addEventListener('click', (e) => {
     if (e.target === dialog) {
       dialog.close();
@@ -464,10 +501,9 @@ function enableDialogLightDismiss(dialog) {
 }
 
 const roomModal = document.getElementById('roomModal');
-const requestModal = document.getElementById('requestModal');
 const lightboxModal = document.getElementById('lightboxModal');
 
-[roomModal, requestModal, lightboxModal].forEach(enableDialogLightDismiss);
+[roomModal, lightboxModal].forEach(enableDialogLightDismiss);
 
 /* ---------------- Модалка подробностей номера (с листанием всех 6 фото и подписями) ---------------- */
 const modalMainImg = document.getElementById('modalMainImg');
@@ -481,7 +517,7 @@ const modalPrice = document.getElementById('modalPrice');
 const modalDesc = document.getElementById('modalDesc');
 const modalAmenities = document.getElementById('modalAmenities');
 const modalWhatsappBtn = document.getElementById('modalWhatsappBtn');
-const modalToCalcBtn = document.getElementById('modalToCalcBtn');
+const modalToBookingBtn = document.getElementById('modalToBookingBtn');
 
 let activeModalRoomId = 'family';
 let activeModalPhotoIdx = 0;
@@ -506,10 +542,12 @@ if (modalPrevBtn && modalNextBtn) {
   modalNextBtn.addEventListener('click', () => renderModalPhoto(activeModalPhotoIdx + 1));
 }
 
-roomModal.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft') renderModalPhoto(activeModalPhotoIdx - 1);
-  if (e.key === 'ArrowRight') renderModalPhoto(activeModalPhotoIdx + 1);
-});
+if (roomModal) {
+  roomModal.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') renderModalPhoto(activeModalPhotoIdx - 1);
+    if (e.key === 'ArrowRight') renderModalPhoto(activeModalPhotoIdx + 1);
+  });
+}
 
 document.querySelectorAll('.open-room-modal').forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -536,52 +574,27 @@ document.querySelectorAll('.open-room-modal').forEach((btn) => {
     const startIdx = btn.classList.contains('room-photos-btn') ? (cardSlideIndex[room.id] || 0) : 0;
     renderModalPhoto(startIdx);
 
-    const msg = `Здравствуйте! Интересует «${room.name}» в гостевом доме «Ура, Селигер!». Подскажите свободные даты и стоимость.`;
+    const msg = `Здравствуйте! Интересует «${room.name}» в гостевом доме «Ура, Селигер!». Подскажите, пожалуйста, детали размещения.`;
     modalWhatsappBtn.href = buildWhatsAppUrl(msg);
 
     roomModal.showModal();
   });
 });
 
-modalToCalcBtn.addEventListener('click', () => {
-  calcRoom.value = activeModalRoomId;
-  updateCalculator();
-  roomModal.close();
-  document.getElementById('calculator').scrollIntoView({ behavior: 'smooth' });
-});
-
-/* ---------------- Модалка быстрой заявки на звонок ---------------- */
-const openQuickRequestBtn = document.getElementById('openQuickRequestBtn');
-const callbackForm = document.getElementById('callbackForm');
-const callbackSuccess = document.getElementById('callbackSuccess');
-const callbackSummaryText = document.getElementById('callbackSummaryText');
-const callbackWhatsappLink = document.getElementById('callbackWhatsappLink');
-
-openQuickRequestBtn.addEventListener('click', () => {
-  callbackForm.hidden = false;
-  callbackSuccess.hidden = true;
-  requestModal.showModal();
-});
-
-callbackForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const name = document.getElementById('guestName').value.trim();
-  const phone = document.getElementById('guestPhone').value.trim();
-  const comment = document.getElementById('guestComment').value.trim();
-
-  const fullText =
-    `${lastCalculationText}\n` +
-    `• Имя: ${name}\n` +
-    `• Телефон: ${phone}` +
-    (comment ? `\n• Комментарий: ${comment}` : '');
-
-  callbackSummaryText.textContent =
-    `${name}, спасибо! Мы подготовили вашу заявку на ${summaryDates.textContent}. Нажмите кнопку ниже, чтобы мгновенно отправить её администратору в WhatsApp.`;
-  callbackWhatsappLink.href = buildWhatsAppUrl(fullText);
-
-  callbackForm.hidden = true;
-  callbackSuccess.hidden = false;
-});
+if (modalToBookingBtn) {
+  modalToBookingBtn.addEventListener('click', () => {
+    const room = ROOMS[activeModalRoomId];
+    if (room && room.tlRoomType) {
+      tlState.roomType = room.tlRoomType;
+      if (room.tlRoomType === '203154' && tlState.adults > 2) {
+        tlState.adults = 2;
+        heroGuests.value = '2';
+      }
+    }
+    roomModal.close();
+    applyBookingParamsToTravelLine({ scrollToBooking: true });
+  });
+}
 
 /* ---------------- Лайтбокс фотогалереи ---------------- */
 const galleryButtons = Array.from(document.querySelectorAll('#galleryGrid .gallery-item'));
@@ -621,7 +634,7 @@ function initScrollReveal() {
     '.room-card',
     '.children-note',
     '.leisure-card',
-    '.calc-shell',
+    '.tl-booking-shell',
     '.gallery-item',
     '.review-card',
     '.faq-item',
@@ -635,7 +648,6 @@ function initScrollReveal() {
     if (el.dataset.revealed === '1') return;
     el.dataset.revealed = '1';
     el.classList.add('is-visible');
-    // После завершения появления убираем inline delay и reveal-класс, чтобы не тормозить hover-анимацию карточек
     window.setTimeout(() => {
       el.style.transitionDelay = '';
       el.classList.remove('reveal-item');
@@ -656,12 +668,12 @@ function initScrollReveal() {
         }
       });
     },
-    { threshold: 0.01, rootMargin: '0px 0px 80px 0px' }
+    { threshold: 0.01, rootMargin: '0px 0px 100px 0px' }
   );
 
   items.forEach((el, idx) => {
     el.classList.add('reveal-item');
-    el.style.transitionDelay = `${(idx % 4) * 55}ms`;
+    el.style.transitionDelay = `${(idx % 4) * 50}ms`;
     observer.observe(el);
   });
 
@@ -671,7 +683,7 @@ function initScrollReveal() {
     items.forEach((el) => {
       if (el.dataset.revealed === '1') return;
       const rect = el.getBoundingClientRect();
-      if (rect.top < vh + 100) {
+      if (rect.top < vh + 120) {
         showElement(el);
         observer.unobserve(el);
       }
@@ -679,8 +691,8 @@ function initScrollReveal() {
   };
 
   window.addEventListener('scroll', revealVisibleFallback, { passive: true });
-  window.setTimeout(revealVisibleFallback, 300);
+  window.addEventListener('hashchange', () => window.setTimeout(revealVisibleFallback, 120));
+  window.setTimeout(revealVisibleFallback, 250);
 }
 
 initScrollReveal();
-

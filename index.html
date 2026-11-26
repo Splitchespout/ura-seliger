@@ -8,7 +8,31 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=7" />
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Hotel",
+      "name": "Гостевой дом «Ура, Селигер!»",
+      "url": "https://uraseliger.ru/",
+      "telephone": "+79259223340",
+      "email": "uraseliger@mail.ru",
+      "checkinTime": "14:00",
+      "checkoutTime": "12:00",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "RU",
+        "addressRegion": "Тверская область",
+        "addressLocality": "Осташковский округ, дер. Конец",
+        "streetAddress": "д. 10А"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "5.0",
+        "reviewCount": "235"
+      }
+    }
+  </script>
 </head>
 <body id="top">
   <!-- Шапка сайта (в стиле Референса 1: чистая скандинавская навигация + бейдж Яндекс Карт 5.0) -->
@@ -26,9 +50,9 @@
       </a>
 
       <nav class="main-nav" aria-label="Основная навигация">
-        <a href="#rooms">Номера и апартаменты</a>
-        <a href="#leisure">Баня и отдых</a>
-        <a href="#calculator">Расчёт цены</a>
+        <a href="#rooms">Номера</a>
+        <a href="#leisure">Отдых и баня</a>
+        <a href="#booking">Бронирование</a>
         <a href="#gallery">Фото</a>
         <a href="#reviews">Отзывы</a>
         <a href="#faq">Вопросы</a>
@@ -36,12 +60,21 @@
       </nav>
 
       <div class="header-actions">
+        <a
+          href="https://uraseliger.ru/guest-account/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="guest-account-pill"
+          title="Личный кабинет гостя TravelLine — проверить или отменить бронь"
+        >
+          Моё бронирование
+        </a>
         <a href="#reviews" class="rating-pill" title="Рейтинг на Яндекс Картах — Награда «Хорошее место»">
           <span class="rating-score">5.0</span>
           <svg class="star-icon" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
             <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
           </svg>
-          <span class="rating-label">Яндекс Карты</span>
+          <span class="rating-label">Яндекс</span>
         </a>
         <button class="mobile-menu-btn" type="button" aria-label="Открыть меню" aria-expanded="false" id="mobileMenuBtn">
           <span></span>
@@ -55,11 +88,12 @@
     <nav class="mobile-nav" id="mobileNav" aria-label="Мобильная навигация" hidden>
       <a href="#rooms">Номера и апартаменты</a>
       <a href="#leisure">Баня и отдых</a>
-      <a href="#calculator">Расчёт цены</a>
+      <a href="#booking">Онлайн-бронирование (TravelLine)</a>
       <a href="#gallery">Фотографии</a>
       <a href="#reviews">Отзывы гостей (5.0 ★)</a>
       <a href="#faq">Частые вопросы</a>
       <a href="#contacts">Как добраться и контакты</a>
+      <a href="https://uraseliger.ru/guest-account/" target="_blank" rel="noopener noreferrer" class="mobile-guest-link">Моё бронирование (личный кабинет) ↗</a>
       <a href="tel:+79259223340" class="mobile-phone">+7 (925) 922-33-40</a>
     </nav>
   </header>
@@ -113,7 +147,7 @@
               </select>
             </div>
             <button type="submit" class="btn btn-primary booking-submit">
-              Забронировать
+              Найти номер
             </button>
           </form>
         </div>
@@ -210,12 +244,17 @@
               </ul>
               <div class="room-footer">
                 <div class="room-price">
-                  <strong>5 000 ₽</strong>
-                  <span>/ ночь за апартаменты</span>
+                  <strong>от 5&nbsp;000&nbsp;₽</strong>
+                  <span>/ ночь · актуальная цена в TravelLine</span>
                 </div>
-                <button type="button" class="btn btn-outline open-room-modal" data-room="apt">
-                  Обзор номера
-                </button>
+                <div class="room-card-actions">
+                  <button type="button" class="btn btn-primary btn-sm book-tl-room" data-tl-room="203156" data-room="apt">
+                    Забронировать
+                  </button>
+                  <button type="button" class="btn btn-outline btn-sm open-room-modal" data-room="apt">
+                    Обзор
+                  </button>
+                </div>
               </div>
             </div>
           </article>
@@ -261,12 +300,17 @@
               </ul>
               <div class="room-footer">
                 <div class="room-price">
-                  <strong>5&nbsp;000&nbsp;₽</strong>
-                  <span>за двоих · доп. +2&nbsp;000&nbsp;₽</span>
+                  <strong>от 5&nbsp;000&nbsp;₽</strong>
+                  <span>за двоих · актуальная цена в TravelLine</span>
                 </div>
-                <button type="button" class="btn btn-primary open-room-modal" data-room="family">
-                  Обзор номера
-                </button>
+                <div class="room-card-actions">
+                  <button type="button" class="btn btn-primary btn-sm book-tl-room" data-tl-room="203155" data-room="family">
+                    Забронировать
+                  </button>
+                  <button type="button" class="btn btn-outline btn-sm open-room-modal" data-room="family">
+                    Обзор
+                  </button>
+                </div>
               </div>
             </div>
           </article>
@@ -313,11 +357,16 @@
               <div class="room-footer">
                 <div class="room-price">
                   <strong>от 3&nbsp;000&nbsp;₽</strong>
-                  <span>/ ночь (5&nbsp;000&nbsp;₽ за двоих)</span>
+                  <span>/ ночь · актуальная цена в TravelLine</span>
                 </div>
-                <button type="button" class="btn btn-outline open-room-modal" data-room="double">
-                  Обзор номера
-                </button>
+                <div class="room-card-actions">
+                  <button type="button" class="btn btn-primary btn-sm book-tl-room" data-tl-room="203154" data-room="double">
+                    Забронировать
+                  </button>
+                  <button type="button" class="btn btn-outline btn-sm open-room-modal" data-room="double">
+                    Обзор
+                  </button>
+                </div>
               </div>
             </div>
           </article>
@@ -409,115 +458,67 @@
       </div>
     </section>
 
-    <!-- Интерактивный калькулятор стоимости отдыха -->
-    <section class="section" id="calculator">
+    <!-- Официальный модуль онлайн-бронирования TravelLine (providerId: 30650) -->
+    <section class="section" id="booking">
       <div class="container">
-        <div class="calc-shell">
-          <div class="calc-left">
-            <span class="eyebrow">Прозрачные цены</span>
-            <h2>Рассчитайте стоимость отдыха</h2>
-            <p class="calc-intro">
-              Укажите даты и состав вашей компании — калькулятор сразу покажет ориентировочную
-              сумму и подготовит сообщение для быстрой брони без комиссий агрегаторов.
-            </p>
-
-            <div class="calc-form" id="calcForm">
-              <div class="calc-row two-col-equal">
-                <div class="form-group date-click-group">
-                  <label for="calcCheckin">Дата заезда</label>
-                  <input type="date" id="calcCheckin" name="calcCheckin" required />
-                </div>
-                <div class="form-group date-click-group">
-                  <label for="calcCheckout">Дата выезда</label>
-                  <input type="date" id="calcCheckout" name="calcCheckout" required />
-                </div>
-              </div>
-
-              <div class="calc-row two-col">
-                <div class="form-group">
-                  <label for="calcRoom">Вариант размещения</label>
-                  <select id="calcRoom">
-                    <option value="double">2-местный номер (с 3-разовым питанием)</option>
-                    <option value="family" selected>4-местный номер с диваном (с питанием)</option>
-                    <option value="apt">Апартаменты-студия (своя кухня, без питания)</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label for="calcNights">Количество ночей</label>
-                  <div class="stepper">
-                    <button type="button" class="step-btn" data-target="calcNights" data-delta="-1" aria-label="Уменьшить ночи">−</button>
-                    <input type="number" id="calcNights" value="2" min="1" max="365" readonly />
-                    <button type="button" class="step-btn" data-target="calcNights" data-delta="1" aria-label="Увеличить ночи">+</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="calc-row three-col">
-                <div class="form-group">
-                  <label for="calcAdults">Взрослые (12+)</label>
-                  <div class="stepper">
-                    <button type="button" class="step-btn" data-target="calcAdults" data-delta="-1" aria-label="Уменьшить взрослых">−</button>
-                    <input type="number" id="calcAdults" value="2" min="1" max="4" readonly />
-                    <button type="button" class="step-btn" data-target="calcAdults" data-delta="1" aria-label="Увеличить взрослых">+</button>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="calcKids">Дети 2–10 лет</label>
-                  <div class="stepper">
-                    <button type="button" class="step-btn" data-target="calcKids" data-delta="-1" aria-label="Уменьшить детей">−</button>
-                    <input type="number" id="calcKids" value="0" min="0" max="3" readonly />
-                    <button type="button" class="step-btn" data-target="calcKids" data-delta="1" aria-label="Увеличить детей">+</button>
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label for="calcBabies">Малыши до 2 лет</label>
-                  <div class="stepper">
-                    <button type="button" class="step-btn" data-target="calcBabies" data-delta="-1" aria-label="Уменьшить малышей">−</button>
-                    <input type="number" id="calcBabies" value="0" min="0" max="2" readonly />
-                    <button type="button" class="step-btn" data-target="calcBabies" data-delta="1" aria-label="Увеличить малышей">+</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="calc-extra" id="aptMealsWrap" hidden>
-                <label class="checkbox-card">
-                  <input type="checkbox" id="calcAptMeals" />
-                  <span>
-                    <strong>Добавить домашнее 3-разовое питание в апартаменты</strong>
-                    <small>Завтрак 350 ₽ + Обед 600 ₽ + Ужин 400 ₽ = 1 350 ₽/чел. в день</small>
-                  </span>
-                </label>
-              </div>
+        <div class="tl-booking-shell">
+          <div class="tl-booking-head">
+            <div>
+              <span class="eyebrow">Официальный модуль TravelLine · Прямые цены</span>
+              <h2>Онлайн-бронирование номеров</h2>
+              <p class="tl-booking-intro">
+                Актуальные свободные даты, точные тарифы и мгновенное подтверждение напрямую из системы бронирования гостевого дома «Ура, Селигер!».
+              </p>
+            </div>
+            <div class="tl-head-meta">
+              <span class="tl-trust-badge">✓ Без комиссий агрегаторов</span>
+              <a
+                href="https://uraseliger.ru/guest-account/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-outline btn-sm"
+              >
+                Моё бронирование ↗
+              </a>
             </div>
           </div>
 
-          <aside class="calc-summary" aria-live="polite">
-            <div class="summary-top">
-              <span class="summary-badge">Прямое бронирование без комиссий</span>
-              <div class="summary-dates" id="summaryDates">Ближайшие выходные · 2 ночи</div>
-            </div>
+          <div class="tl-room-filter" id="tlRoomFilter" role="group" aria-label="Быстрый выбор категории номера в TravelLine">
+            <button type="button" class="tl-filter-btn is-active" data-tl-filter="">Все номера</button>
+            <button type="button" class="tl-filter-btn" data-tl-filter="203156">Апартаменты-студия</button>
+            <button type="button" class="tl-filter-btn" data-tl-filter="203155">4-местный с диваном</button>
+            <button type="button" class="tl-filter-btn" data-tl-filter="203154">2-местный номер</button>
+          </div>
 
-            <div class="summary-breakdown" id="summaryBreakdown">
-              <!-- Заполняется скриптом -->
+          <div class="tl-widget-stage" id="tlWidgetStage">
+            <div class="tl-loading-state" id="tlLoadingState" role="status" aria-live="polite">
+              <div class="tl-spinner" aria-hidden="true"></div>
+              <p>Загружаем актуальные свободные даты и тарифы из TravelLine…</p>
             </div>
+            <!-- Контейнер официального модуля TravelLine -->
+            <div id="tl-booking-form" class="tl-booking-container"></div>
+          </div>
 
-            <div class="summary-total">
-              <span>Итого ориентировочно:</span>
-              <strong id="summaryTotalPrice">10 000 ₽</strong>
-            </div>
-
-            <div class="summary-actions">
-              <a href="#" id="whatsappBookBtn" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full">
-                Забронировать в WhatsApp
-              </a>
-              <button type="button" class="btn btn-outline btn-full" id="openQuickRequestBtn">
-                Оставить заявку на звонок
-              </button>
-            </div>
-            <p class="summary-footnote">
-              Окончательную стоимость на праздничные и сезонные даты подтверждаем лично за 10 минут.
+          <div class="tl-booking-foot">
+            <p>
+              Нужна помощь с подбором дат, заездом с питомцем или заказом бани?
+              Позвоните <a href="tel:+79259223340">+7 (925) 922-33-40</a> или напишите в
+              <a
+                href="https://wa.me/79259223340?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%82%D0%B8%D0%BC%20%D1%83%D1%82%D0%BE%D1%87%D0%BD%D0%B8%D1%82%D1%8C%20%D0%B4%D0%B5%D1%82%D0%B0%D0%BB%D0%B8%20%D0%BF%D0%BE%20%D0%B1%D1%80%D0%BE%D0%BD%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8E%20%D0%B2%20%C2%AB%D0%A3%D1%80%D0%B0%2C%20%D0%A1%D0%B5%D0%BB%D0%B8%D0%B3%D0%B5%D1%80!%C2%BB"
+                target="_blank"
+                rel="noopener noreferrer"
+              >WhatsApp</a>.
             </p>
-          </aside>
+            <a
+              id="tlFallbackLink"
+              href="https://uraseliger.ru/ru-ru/booking/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-link tl-direct-link"
+            >
+              Открыть бронирование в отдельном окне ↗
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -745,8 +746,8 @@
               <p>
                 Стандартное время заезда — <strong>с 14:00</strong>, выезд — <strong>до 12:00</strong>
                 (по возможности всегда идём навстречу при раннем заезде или позднем выезде).
-                Выберите даты в калькуляторе выше или позвоните нам по номеру
-                <a href="tel:+79259223340">+7 (925) 922-33-40</a> — мы сразу подтвердим свободный номер.
+                Выберите даты в форме <a href="#booking">онлайн-бронирования TravelLine</a> выше для мгновенного подтверждения, или позвоните нам по номеру
+                <a href="tel:+79259223340">+7 (925) 922-33-40</a>.
               </p>
             </div>
           </details>
@@ -837,16 +838,24 @@
                 <small>Берег озера Серменок · ~190 км от Твери · ~400 км от Москвы</small>
               </div>
               <div class="contact-item">
-                <span class="contact-label">Сообщество ВКонтакте</span>
-                <a href="https://vk.com/seligerura" target="_blank" rel="noopener noreferrer" class="contact-value link-accent">
-                  vk.com/seligerura
-                </a>
+                <span class="contact-label">Сообщество ВКонтакте и почта</span>
+                <div class="contact-inline-links">
+                  <a href="https://vk.com/seligerura" target="_blank" rel="noopener noreferrer" class="contact-value link-accent">
+                    vk.com/seligerura
+                  </a>
+                  <a href="mailto:uraseliger@mail.ru" class="contact-email">
+                    uraseliger@mail.ru
+                  </a>
+                </div>
               </div>
             </div>
 
             <div class="contact-buttons">
-              <a href="tel:+79259223340" class="btn btn-primary">
-                Позвонить +7 (925) 922-33-40
+              <a href="#booking" class="btn btn-primary">
+                Забронировать онлайн
+              </a>
+              <a href="tel:+79259223340" class="btn btn-outline">
+                Позвонить
               </a>
               <a
                 href="https://wa.me/79259223340?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%A5%D0%BE%D1%82%D0%B8%D0%BC%20%D1%83%D1%82%D0%BE%D1%87%D0%BD%D0%B8%D1%82%D1%8C%20%D1%81%D0%B2%D0%BE%D0%B1%D0%BE%D0%B4%D0%BD%D1%8B%D0%B5%20%D0%B4%D0%B0%D1%82%D1%8B%20%D0%B2%20%C2%AB%D0%A3%D1%80%D0%B0%2C%20%D0%A1%D0%B5%D0%BB%D0%B8%D0%B3%D0%B5%D1%80!%C2%BB"
@@ -854,7 +863,7 @@
                 rel="noopener noreferrer"
                 class="btn btn-outline"
               >
-                Написать в WhatsApp
+                WhatsApp
               </a>
             </div>
           </div>
@@ -903,8 +912,10 @@
       <div class="footer-links">
         <a href="#rooms">Номера</a>
         <a href="#leisure">Отдых</a>
-        <a href="#calculator">Цены</a>
+        <a href="#booking">Бронирование</a>
         <a href="#faq">Вопросы</a>
+        <a href="https://uraseliger.ru/guest-account/" target="_blank" rel="noopener noreferrer">Моё бронирование</a>
+        <a href="https://uraseliger.ru/docs/privacy_policy_ru.pdf" target="_blank" rel="noopener noreferrer">Политика конфиденциальности</a>
         <a href="https://vk.com/seligerura" target="_blank" rel="noopener noreferrer">ВКонтакте</a>
         <a href="tel:+79259223340">+7 (925) 922-33-40</a>
       </div>
@@ -931,51 +942,11 @@
         <p id="modalDesc"></p>
         <ul class="modal-list" id="modalAmenities"></ul>
         <div class="modal-cta-row">
-          <a href="#" id="modalWhatsappBtn" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
-            Забронировать в WhatsApp
-          </a>
-          <button type="button" class="btn btn-outline" id="modalToCalcBtn">
-            Рассчитать даты
+          <button type="button" class="btn btn-primary" id="modalToBookingBtn">
+            Забронировать онлайн (TravelLine)
           </button>
-        </div>
-      </div>
-    </div>
-  </dialog>
-
-  <!-- Модальное окно быстрой заявки на обратный звонок -->
-  <dialog class="modal-dialog modal-narrow" id="requestModal" aria-labelledby="requestModalTitle">
-    <div class="modal-box modal-box-single">
-      <button type="button" class="modal-close" data-close-dialog aria-label="Закрыть окно">✕</button>
-      <span class="eyebrow">Прямая заявка</span>
-      <h3 id="requestModalTitle">Оставить заявку на бронь</h3>
-      <p class="modal-sub">Укажите имя и телефон — мы сразу подготовим заполненную заявку для отправки администратору в WhatsApp или для быстрого звонка.</p>
-
-      <form id="callbackForm" class="callback-form">
-        <div class="form-group">
-          <label for="guestName">Ваше имя</label>
-          <input type="text" id="guestName" name="name" placeholder="Например, Анна" required autocomplete="name" />
-        </div>
-        <div class="form-group">
-          <label for="guestPhone">Телефон или WhatsApp</label>
-          <input type="tel" id="guestPhone" name="phone" placeholder="+7 (999) 000-00-00" required autocomplete="tel" />
-        </div>
-        <div class="form-group">
-          <label for="guestComment">Пожелания (необязательно)</label>
-          <textarea id="guestComment" name="comment" rows="3" placeholder="Даты, баня, поездка с питомцем..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary btn-full">Сформировать заявку</button>
-      </form>
-
-      <div class="form-success" id="callbackSuccess" hidden>
-        <div class="success-icon">✓</div>
-        <h4>Заявка готова к отправке!</h4>
-        <p id="callbackSummaryText"></p>
-        <div class="modal-cta-row">
-          <a href="#" id="callbackWhatsappLink" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-full">
-            Отправить в WhatsApp
-          </a>
-          <a href="tel:+79259223340" class="btn btn-outline btn-full">
-            Позвонить +7 (925) 922-33-40
+          <a href="#" id="modalWhatsappBtn" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+            Задать вопрос в WhatsApp
           </a>
         </div>
       </div>
@@ -1008,6 +979,6 @@
     </span>
   </a>
 
-  <script src="script.js?v=6"></script>
+  <script src="script.js?v=7"></script>
 </body>
 </html>
