@@ -104,9 +104,21 @@ function buildWhatsAppUrl(text) {
   return `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(text)}`;
 }
 
-/* ---------------- Мобильное меню ---------------- */
+/* ---------------- Мобильное меню и клик по логотипу «Ура, Селигер!» ---------------- */
+const brandLink = document.querySelector('.brand');
 const mobileMenuBtn = document.getElementById('mobileMenuBtn');
 const mobileNav = document.getElementById('mobileNav');
+
+if (brandLink) {
+  brandLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (mobileNav && !mobileNav.hidden) {
+      mobileNav.hidden = true;
+      if (mobileMenuBtn) mobileMenuBtn.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
 
 if (mobileMenuBtn && mobileNav) {
   mobileMenuBtn.addEventListener('click', () => {
