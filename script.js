@@ -24,9 +24,12 @@ const ROOMS = {
       'Домашнее питание по желанию: завтрак 350 ₽, обед 600 ₽, ужин 400 ₽',
     ],
     photos: [
-      { src: 'assets/images/vk_apt_1.jpg', alt: 'Спальная и гостиная зона апартаментов' },
-      { src: 'assets/images/vk_apt_2.jpg', alt: 'Гостиная с диваном и столом' },
-      { src: 'assets/images/vk_apt_3.jpg', alt: 'Собственная кухня в апартаментах' },
+      { src: 'assets/images/tl_apt_2.jpg', alt: 'Апартаменты-студия: спальная зона, обеденный стол и гостиная' },
+      { src: 'assets/images/tl_apt_1.jpg', alt: 'Гостиная зона апартаментов с диваном, столом и витражным окном' },
+      { src: 'assets/images/tl_apt_5.jpg', alt: 'Собственная кухня с холодильником, плитой, микроволновкой и посудой' },
+      { src: 'assets/images/tl_apt_8.jpg', alt: 'Вид из мансардного окна апартаментов на зелёную территорию' },
+      { src: 'assets/images/tl_apt_4.jpg', alt: 'Отдельная прихожая в апартаментах' },
+      { src: 'assets/images/vk_apt_4.jpg', alt: 'Чайная коллекция для гостей апартаментов' },
     ],
   },
   family: {
@@ -35,7 +38,7 @@ const ROOMS = {
     tag: '3-разовое домашнее питание включено',
     priceLabel: '5 000 ₽ / ночь за двоих (+2 000 ₽ доп. место)',
     description:
-      'Просторный тёплый номер с отделкой из натурального дерева в основном доме. Включает полный 3-разовый домашний пансион и доступ в уютную лаундж-зону с самоваром, чаем и настольными играми.',
+      'Просторный тёплый номер (20 м²) с отделкой из натурального дерева в основном доме. Включает полный 3-разовый домашний пансион и доступ в уютную лаундж-зону с самоваром, чаем и настольными играми.',
     amenities: [
       'Домашнее 3-разовое питание (завтрак, обед, ужин) включено',
       'Две комфортные кровати + раскладной диван (до 4 человек)',
@@ -44,9 +47,12 @@ const ROOMS = {
       'Бесплатные лодки, пляж с лежаками, мангал, настольный теннис и Wi-Fi',
     ],
     photos: [
-      { src: 'assets/images/vk_family_2.jpg', alt: 'Просторный 4-местный номер с двумя кроватями' },
-      { src: 'assets/images/vk_family_1.jpg', alt: 'Зона отдыха с диваном и телевизором' },
-      { src: 'assets/images/vk_family_3.jpg', alt: 'Спальная зона 4-местного номера' },
+      { src: 'assets/images/tl_family_4.jpg', alt: 'Общий вид 4-местного номера: две кровати, стол и окно в сад' },
+      { src: 'assets/images/tl_family_1.jpg', alt: 'Зона отдыха с раскладным диваном, телевизором и столом' },
+      { src: 'assets/images/tl_family_5.jpg', alt: 'Прихожая зона, вместительный шкаф, ТВ и диван' },
+      { src: 'assets/images/tl_family_2.jpg', alt: 'Две отдельные кровати с тёплым локальным освещением' },
+      { src: 'assets/images/tl_family_7.jpg', alt: 'Собственный санузел номера с душевой кабиной' },
+      { src: 'assets/images/tl_family_3.jpg', alt: 'Деревянный холл и лестница на втором этаже основного дома' },
     ],
   },
   double: {
@@ -55,7 +61,7 @@ const ROOMS = {
     tag: '3-разовое домашнее питание включено',
     priceLabel: '3 000 ₽ за 1 гостя · 5 000 ₽ за двоих / ночь',
     description:
-      'Светлый уютный номер с большой двуспальной кроватью и окнами в зелёный сад. Отличный вариант для пары или спокойного сольного отдыха у воды с домашним питанием.',
+      'Светлый уютный номер с большой двуспальной кроватью и видом из окна на озеро Серменок и зелёный сад. Отличный вариант для пары или спокойного отдыха у воды с домашним питанием.',
     amenities: [
       'Домашнее 3-разовое питание включено в стоимость',
       'Удобная двуспальная кровать, ТВ и обеденный столик',
@@ -64,9 +70,12 @@ const ROOMS = {
       'Бесплатные прогулочные лодки, свой пляж и мангальная зона',
     ],
     photos: [
-      { src: 'assets/images/vk_double_3.jpg', alt: 'Двухместный номер с большой кроватью' },
-      { src: 'assets/images/vk_double_1.jpg', alt: 'Вид на окна и зону отдыха номера' },
-      { src: 'assets/images/vk_double_2.jpg', alt: 'Собственный санузел с душевой кабиной' },
+      { src: 'assets/images/tl_double_3.jpg', alt: 'Двухместный номер: большая кровать, прихожая и телевизор' },
+      { src: 'assets/images/tl_double_2.jpg', alt: 'Вид прямо из окна номера на озеро Серменок и территорию' },
+      { src: 'assets/images/tl_double_5.jpg', alt: 'Светлая спальная зона с окном и обеденным столиком' },
+      { src: 'assets/images/tl_double_4.jpg', alt: 'Вид на два больших окна, стол и шкаф в номере' },
+      { src: 'assets/images/tl_double_1.jpg', alt: 'Интерьер двухместного номера со стороны окна' },
+      { src: 'assets/images/tl_double_6.jpg', alt: 'Собственная ванная комната с душевой кабиной в номере' },
     ],
   },
 };
@@ -419,9 +428,12 @@ const lightboxModal = document.getElementById('lightboxModal');
 
 [roomModal, requestModal, lightboxModal].forEach(enableDialogLightDismiss);
 
-/* ---------------- Модалка подробностей номера ---------------- */
+/* ---------------- Модалка подробностей номера (с листанием всех 6 фото и подписями) ---------------- */
 const modalMainImg = document.getElementById('modalMainImg');
 const modalThumbs = document.getElementById('modalThumbs');
+const modalPhotoCaption = document.getElementById('modalPhotoCaption');
+const modalPrevBtn = document.getElementById('modalPrevBtn');
+const modalNextBtn = document.getElementById('modalNextBtn');
 const modalTag = document.getElementById('modalTag');
 const roomModalTitle = document.getElementById('roomModalTitle');
 const modalPrice = document.getElementById('modalPrice');
@@ -431,6 +443,32 @@ const modalWhatsappBtn = document.getElementById('modalWhatsappBtn');
 const modalToCalcBtn = document.getElementById('modalToCalcBtn');
 
 let activeModalRoomId = 'family';
+let activeModalPhotoIdx = 0;
+
+function renderModalPhoto(idx) {
+  const room = ROOMS[activeModalRoomId];
+  if (!room) return;
+  activeModalPhotoIdx = (idx + room.photos.length) % room.photos.length;
+  const p = room.photos[activeModalPhotoIdx];
+  modalMainImg.src = p.src;
+  modalMainImg.alt = p.alt;
+  if (modalPhotoCaption) {
+    modalPhotoCaption.textContent = `${activeModalPhotoIdx + 1} / ${room.photos.length} · ${p.alt}`;
+  }
+  modalThumbs.querySelectorAll('button').forEach((b, i) => {
+    b.classList.toggle('active', i === activeModalPhotoIdx);
+  });
+}
+
+if (modalPrevBtn && modalNextBtn) {
+  modalPrevBtn.addEventListener('click', () => renderModalPhoto(activeModalPhotoIdx - 1));
+  modalNextBtn.addEventListener('click', () => renderModalPhoto(activeModalPhotoIdx + 1));
+}
+
+roomModal.addEventListener('keydown', (e) => {
+  if (e.key === 'ArrowLeft') renderModalPhoto(activeModalPhotoIdx - 1);
+  if (e.key === 'ArrowRight') renderModalPhoto(activeModalPhotoIdx + 1);
+});
 
 document.querySelectorAll('.open-room-modal').forEach((btn) => {
   btn.addEventListener('click', () => {
@@ -444,23 +482,17 @@ document.querySelectorAll('.open-room-modal').forEach((btn) => {
     modalDesc.textContent = room.description;
     modalAmenities.innerHTML = room.amenities.map((item) => `<li>${item}</li>`).join('');
 
-    modalMainImg.src = room.photos[0].src;
-    modalMainImg.alt = room.photos[0].alt;
     modalThumbs.innerHTML = '';
-
     room.photos.forEach((p, idx) => {
       const thumbBtn = document.createElement('button');
       thumbBtn.type = 'button';
       if (idx === 0) thumbBtn.className = 'active';
       thumbBtn.innerHTML = `<img src="${p.src}" alt="${p.alt}" />`;
-      thumbBtn.addEventListener('click', () => {
-        modalMainImg.src = p.src;
-        modalMainImg.alt = p.alt;
-        modalThumbs.querySelectorAll('button').forEach((b) => b.classList.remove('active'));
-        thumbBtn.classList.add('active');
-      });
+      thumbBtn.addEventListener('click', () => renderModalPhoto(idx));
       modalThumbs.appendChild(thumbBtn);
     });
+
+    renderModalPhoto(0);
 
     const msg = `Здравствуйте! Интересует «${room.name}» в гостевом доме «Ура, Селигер!». Подскажите свободные даты и стоимость.`;
     modalWhatsappBtn.href = buildWhatsAppUrl(msg);
@@ -539,3 +571,47 @@ lightboxModal.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowLeft') showLightboxPhoto(lbIndex - 1);
   if (e.key === 'ArrowRight') showLightboxPhoto(lbIndex + 1);
 });
+
+/* ---------------- Плавное появление карточек при прокрутке (Scroll Reveal) ---------------- */
+function initScrollReveal() {
+  const revealSelectors = [
+    '.highlight-item',
+    '.room-card',
+    '.children-note',
+    '.leisure-card',
+    '.calc-shell',
+    '.gallery-item',
+    '.review-card',
+    '.faq-item',
+    '.contacts-info',
+    '.contacts-map-card',
+  ];
+
+  const items = document.querySelectorAll(revealSelectors.join(', '));
+  if (!('IntersectionObserver' in window)) {
+    items.forEach((el) => el.classList.add('is-visible'));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          obs.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.12, rootMargin: '0px 0px -36px 0px' }
+  );
+
+  items.forEach((el, idx) => {
+    el.classList.add('reveal-item');
+    // Мягкая каскадная задержка внутри одного ряда
+    el.style.transitionDelay = `${(idx % 4) * 55}ms`;
+    observer.observe(el);
+  });
+}
+
+initScrollReveal();
+

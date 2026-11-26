@@ -579,6 +579,34 @@ textarea {
   color: #ffffff;
 }
 
+/* Кнопочка просмотра всех фото номера на карточке */
+.room-photos-btn {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(24, 30, 26, 0.76);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  transition: background-color var(--transition), transform var(--transition);
+}
+
+.room-photos-btn:hover {
+  background: var(--pine);
+  transform: translateY(-1px);
+}
+
 /* Мини-карусель внутри карточки */
 .carousel-btn {
   position: absolute;
@@ -1280,6 +1308,227 @@ textarea {
   box-shadow: var(--shadow-md);
 }
 
+.contacts-map-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-md);
+  min-height: 440px;
+}
+
+.map-frame-wrap {
+  flex: 1;
+  min-height: 310px;
+  background: #e5e0d4;
+}
+
+.map-frame-wrap iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 310px;
+  border: 0;
+}
+
+.route-card-bottom {
+  position: static;
+  border-radius: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.route-card-bottom p {
+  margin-bottom: 0;
+}
+
+.route-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* --------------------------------------------------------------------------
+   Блок Частых вопросов (FAQ)
+   -------------------------------------------------------------------------- */
+.faq-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.faq-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.faq-item[open] {
+  border-color: rgba(74, 107, 83, 0.5);
+  box-shadow: var(--shadow-md);
+}
+
+.faq-item summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.02rem;
+  color: var(--ink);
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--pine-soft);
+  color: var(--pine);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: transform var(--transition), background-color var(--transition), color var(--transition);
+}
+
+.faq-item[open] .faq-icon {
+  transform: rotate(45deg);
+  background: var(--pine);
+  color: #ffffff;
+}
+
+.faq-answer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  color: var(--ink-muted);
+  font-size: 0.93rem;
+}
+
+.faq-answer p {
+  margin: 0;
+}
+
+.faq-answer a {
+  color: var(--pine);
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Плавающая кнопка «Позвонить» и плавное появление карточек (Scroll Reveal)
+   -------------------------------------------------------------------------- */
+.floating-call-btn {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 38;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 18px 10px 10px;
+  border-radius: 999px;
+  background: var(--pine);
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(45, 72, 53, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  transition: transform var(--transition), background-color var(--transition), box-shadow var(--transition);
+}
+
+.floating-call-btn:hover {
+  background: var(--pine-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(45, 72, 53, 0.48);
+}
+
+.call-btn-icon {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.call-btn-icon::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  animation: callPulse 2.2s infinite ease-out;
+}
+
+@keyframes callPulse {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.32);
+    opacity: 0;
+  }
+}
+
+.call-btn-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.call-btn-text strong {
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.call-btn-text small {
+  font-size: 0.76rem;
+  opacity: 0.9;
+}
+
+/* Плавное появление карточек при скролле */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 .contacts-visual img {
   width: 100%;
   height: 100%;
@@ -1430,11 +1679,61 @@ textarea {
   flex-direction: column;
 }
 
-.modal-gallery > img {
-  width: 100%;
-  height: 340px;
-  object-fit: cover;
+.modal-main-stage {
+  position: relative;
   flex: 1;
+  min-height: 350px;
+  background: #141816;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.modal-main-stage > img {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+}
+
+.modal-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(20, 24, 21, 0.72);
+  color: #ffffff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition);
+}
+
+.modal-nav:hover {
+  background: var(--pine);
+}
+
+.modal-nav.prev { left: 12px; }
+.modal-nav.next { right: 12px; }
+
+.modal-photo-caption {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 10px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: rgba(18, 22, 19, 0.74);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .modal-thumbs {
@@ -1686,10 +1985,19 @@ textarea {
   .highlights-grid,
   .rooms-grid,
   .reviews-grid,
+  .faq-grid,
   .calc-row.two-col,
   .calc-row.two-col-equal,
   .calc-row.three-col {
     grid-template-columns: 1fr;
+  }
+  .floating-call-btn {
+    right: 14px;
+    bottom: 14px;
+    padding: 8px 14px 8px 8px;
+  }
+  .call-btn-text small {
+    display: none;
   }
   .leisure-card {
     grid-template-columns: 1fr;
